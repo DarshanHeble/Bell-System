@@ -1,0 +1,7 @@
+export { default as addTab } from './addTab'
+export { default as getAllTabs } from './getAllTabs'
+export { default as addTimeDataToTab } from './addTimeDataToTab'
+export { default as deleteTimeData } from './deleteTimeData'
+export { default as renameTab } from './renameTab'
+export { default as deleteTab } from './deleteTab'
+export { default as playAudio } from './playAudio'
