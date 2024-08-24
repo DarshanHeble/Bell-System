@@ -6,8 +6,8 @@ import {
   nativeTheme,
   dialog,
   powerSaveBlocker,
-  powerMonitor,
-  Notification
+  powerMonitor
+  // Notification
 } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -37,12 +37,12 @@ mkdirSync(projectMusicDirPath, { recursive: true })
 // Prevent app suspension
 // powerSaveBlocker.start('prevent-app-suspension')
 
-const NOTIFICATION_TITLE = 'Basic Notification'
-const NOTIFICATION_BODY = 'Notification from the Main process'
+// const NOTIFICATION_TITLE = 'Basic Notification'
+// const NOTIFICATION_BODY = 'Notification from the Main process'
 
-function showNotification(): void {
-  new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
-}
+// function showNotification(): void {
+//   new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
+// }
 
 app.on('ready', () => {
   // Prevent display sleep
@@ -115,10 +115,12 @@ app.whenReady().then(() => {
   ipcMain.handle('addTimeData', (_, _id: string, data: TimeData) => addTimeDataToTab(_id, data))
   ipcMain.handle('deleteTimeData', (_, _id: string, data: TimeData) => deleteTimeData(_id, data))
 
-  ipcMain.handle('playAudio', async (_, audiofileName: string) => {
-    await playAudio(audiofileName)
-    console.log('audio played')
-  })
+  ipcMain.handle(
+    'playAudio',
+    async (_, audiofileName: string, tab_name: string, timedata: TimeData) => {
+      await playAudio(audiofileName, tab_name, timedata)
+    }
+  )
 
   ipcMain.handle('select-music-file', async () => {
     try {

@@ -21,7 +21,7 @@ export const getCurrentTime = (): Time => {
 
 let isPlayingAudio = false
 
-export const checkTimeMatch = (tabs: Tab[]): void => {
+export const checkTimeMatch = (tabs: Tab[], activeTab: string): void => {
   const now = new Date()
   const currentHour = now.getHours()
   const currentMinute = now.getMinutes()
@@ -29,21 +29,28 @@ export const checkTimeMatch = (tabs: Tab[]): void => {
   const formattedHour = currentHour % 12 || 12 // Convert to 12-hour format
 
   tabs.forEach((tab: Tab) => {
-    tab.data.forEach(async (item) => {
-      const { hour, minute, period } = item.time
+    if (tab._id === activeTab) {
+      tab.data.forEach(async (item) => {
+        const { hour, minute, period } = item.time
 
-      if (
-        hour === formattedHour &&
-        minute === currentMinute &&
-        period === currentPeriod &&
-        !isPlayingAudio
-      ) {
-        isPlayingAudio = true
-        console.log(`Time matched for label: ${item.label} at ${hour}:${minute} ${period}`)
-        await window.electron.ipcRenderer.invoke('playAudio', item.music_file_name)
-        console.log('Audio played fully and returned to Renderer')
-        isPlayingAudio = false
-      }
-    })
+        if (
+          hour === formattedHour &&
+          minute === currentMinute &&
+          period === currentPeriod &&
+          !isPlayingAudio
+        ) {
+          isPlayingAudio = true
+          console.log(`Time matched for label: ${item.label} at ${hour}:${minute} ${period}`)
+          await window.electron.ipcRenderer.invoke(
+            'playAudio',
+            item.music_file_name,
+            tab.tab_name,
+            item
+          )
+          console.log('Audio played fully and returned to Renderer')
+          isPlayingAudio = false
+        }
+      })
+    }
   })
 }

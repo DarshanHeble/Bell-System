@@ -25,6 +25,11 @@ export type Tab = {
   data: TimeData[]
 }
 
+export type activeTabType = {
+  index: number
+  name: string
+}
+
 export type TabWithOut_Id = Omit<Tab, '_id'>
 
 export type TabWithRev = Tab & { _rev: string }

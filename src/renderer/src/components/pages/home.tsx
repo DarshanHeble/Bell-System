@@ -46,6 +46,7 @@ function Home(): JSX.Element {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const tabsRef = useRef(tabs) // Use ref to store the latest tabs state
+  const activeTabRef = useRef(activeTab) // Use ref to store the active tab state
   const intervalIdRef = useRef<NodeJS.Timeout | null>(null) // Use ref to store interval ID
 
   const [cardContextMenu, setCardContextMenu] = useState<{
@@ -71,9 +72,13 @@ function Home(): JSX.Element {
   }, [tabs])
 
   useEffect(() => {
+    activeTabRef.current = activeTab
+  }, [activeTab])
+
+  useEffect(() => {
     intervalIdRef.current = setInterval(() => {
-      checkTimeMatch(tabsRef.current)
-    }, 30000) // Check every second
+      checkTimeMatch(tabsRef.current, activeTabRef.current)
+    }, 3000) // Check every second
 
     return (): void => {
       if (intervalIdRef.current) {
@@ -92,6 +97,7 @@ function Home(): JSX.Element {
 
         if (fetchedTabs.length > 0) {
           setActiveTab(fetchedTabs[0]._id)
+          // console.log('set active', activeTab)
         }
       } catch (error) {
         console.error('Error fetching tabs:', error)
