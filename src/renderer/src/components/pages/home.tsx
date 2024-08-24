@@ -73,7 +73,7 @@ function Home(): JSX.Element {
   useEffect(() => {
     intervalIdRef.current = setInterval(() => {
       checkTimeMatch(tabsRef.current)
-    }, 1000) // Check every second
+    }, 30000) // Check every second
 
     return (): void => {
       if (intervalIdRef.current) {

@@ -6,7 +6,8 @@ import {
   nativeTheme,
   dialog,
   powerSaveBlocker,
-  powerMonitor
+  powerMonitor,
+  Notification
 } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -35,6 +36,13 @@ mkdirSync(projectMusicDirPath, { recursive: true })
 
 // Prevent app suspension
 // powerSaveBlocker.start('prevent-app-suspension')
+
+const NOTIFICATION_TITLE = 'Basic Notification'
+const NOTIFICATION_BODY = 'Notification from the Main process'
+
+function showNotification(): void {
+  new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
+}
 
 app.on('ready', () => {
   // Prevent display sleep
@@ -113,24 +121,29 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('select-music-file', async () => {
-    const result = await dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
-    })
+    try {
+      const result = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
+      })
 
-    if (result.canceled) {
+      if (result.canceled) {
+        return null
+      } else {
+        const filePath = result.filePaths[0]
+        const destinationPath = path.join(projectMusicDirPath, path.basename(filePath))
+
+        // Ensure the music directory exists
+        mkdirSync(projectMusicDirPath, { recursive: true })
+
+        // Copy the file
+        copyFileSync(filePath, destinationPath)
+
+        return destinationPath
+      }
+    } catch (error) {
+      console.error('Error selecting and copying music file:', error)
       return null
-    } else {
-      const filePath = result.filePaths[0]
-      const destinationPath = path.join(projectMusicDirPath, path.basename(filePath))
-
-      // Ensure the music directory exists
-      mkdirSync(projectMusicDirPath, { recursive: true })
-
-      // Copy the file
-      copyFileSync(filePath, destinationPath)
-
-      return destinationPath
     }
   })
 
