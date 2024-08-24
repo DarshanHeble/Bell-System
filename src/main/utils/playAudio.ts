@@ -33,7 +33,8 @@ const playAudio = async (
       new Notification({
         title: 'Bell System',
         subtitle: tab_name,
-        body: `Bell On: ${hour}: ${minute} ${period}`
+        body: `Bell On: ${hour}: ${minute} ${period}`,
+        icon: path.join(__dirname, '../../../resources/icon.png')
       }).show()
     })
   } catch (err) {

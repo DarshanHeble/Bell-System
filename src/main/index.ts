@@ -6,7 +6,8 @@ import {
   nativeTheme,
   dialog,
   powerSaveBlocker,
-  powerMonitor
+  powerMonitor,
+  Notification
   // Notification
 } from 'electron'
 import path, { join } from 'path'
@@ -54,6 +55,12 @@ app.on('ready', () => {
   powerMonitor.on('suspend', () => {
     powerSaveBlocker.start('prevent-app-suspension')
   })
+  new Notification({
+    title: 'Bell System',
+    subtitle: 'classes',
+    body: `Bell On: 3:21am`,
+    icon: path.join(__dirname, '../../resources/icon.ico')
+  }).show()
 })
 
 function createWindow(): void {
