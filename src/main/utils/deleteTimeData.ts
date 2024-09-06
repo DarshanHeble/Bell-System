@@ -1,9 +1,9 @@
 import { TabWithRev, TimeData } from '@shared/type'
-import pdb from '../pouchdb'
+import { pdbBell } from '../pouchdb'
 
 const deleteTimeData = async (_id: string, timeData: TimeData): Promise<void> => {
   try {
-    const doc = await pdb.get<TabWithRev>(_id)
+    const doc = await pdbBell.get<TabWithRev>(_id)
 
     const updatedData = doc.data.filter(
       (item) =>
@@ -23,7 +23,7 @@ const deleteTimeData = async (_id: string, timeData: TimeData): Promise<void> =>
     doc.data = updatedData
 
     // Put the updated document back into the database
-    await pdb.put(doc)
+    await pdbBell.put(doc)
 
     console.log(`Deleted time data with label: ${timeData.label}`)
   } catch (error) {

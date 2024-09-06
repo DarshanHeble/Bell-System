@@ -1,11 +1,11 @@
 import { TabWithOut_Id } from '@shared/type'
-import pdb from '../pouchdb'
+import { pdbBell } from '../pouchdb'
 
 const addTab = async (tab: TabWithOut_Id): Promise<string | null> => {
   console.log(tab)
 
   try {
-    const response = await pdb.post({
+    const response = await pdbBell.post({
       ...tab
     })
 

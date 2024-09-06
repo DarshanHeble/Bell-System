@@ -1,4 +1,4 @@
-import { pdbFilePath, projectDirPath } from '@shared/constant'
+import { pdbBellFilePath, projectDirPath, pdbOtherFilePath } from '@shared/constant'
 import { existsSync, mkdirSync } from 'fs'
 import PouchDB from 'pouchdb'
 
@@ -7,6 +7,6 @@ if (!existsSync(projectDirPath)) {
 }
 console.log(projectDirPath)
 
-const pdb = new PouchDB(pdbFilePath)
+export const pdbBell = new PouchDB(pdbBellFilePath)
 
-export default pdb
+export const pdbOther = new PouchDB(pdbOtherFilePath)

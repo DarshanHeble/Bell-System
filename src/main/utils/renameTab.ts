@@ -1,11 +1,11 @@
-import pdb from '../pouchdb'
+import { pdbBell } from '../pouchdb'
 
 export const renameTab = async (_id: string, newTabName: string): Promise<void> => {
   try {
     // Get the document to retrieve the _rev field
     // const doc = await pdb.get(tabId)
-    await pdb.get(_id).then(function (doc) {
-      return pdb.put({
+    await pdbBell.get(_id).then(function (doc) {
+      return pdbBell.put({
         ...doc,
         _id: _id,
         _rev: doc._rev,

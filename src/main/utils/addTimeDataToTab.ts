@@ -1,11 +1,11 @@
 import { Tab, TimeData } from '@shared/type'
-import pdb from '../pouchdb'
+import { pdbBell } from '../pouchdb'
 
 // Function to add TimeData to a specific Tab
 export const addTimeDataToTab = async (_id: string, timeData: TimeData): Promise<void> => {
   try {
     // Fetch the existing Tab document
-    const existingDoc = await pdb.get(_id)
+    const existingDoc = await pdbBell.get(_id)
 
     if (existingDoc) {
       // Cast to Tab type
@@ -22,7 +22,7 @@ export const addTimeDataToTab = async (_id: string, timeData: TimeData): Promise
       }
 
       // Save the updated document back to PouchDB
-      await pdb.put(updatedDoc)
+      await pdbBell.put(updatedDoc)
       //   console.log(updatedDoc)
 
       console.log('TimeData added successfully')
