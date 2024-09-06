@@ -10,3 +10,4 @@ console.log(projectDirPath)
 export const pdbBell = new PouchDB(pdbBellFilePath)
 
 export const pdbOther = new PouchDB(pdbOtherFilePath)
+console.log(pdbOtherFilePath)

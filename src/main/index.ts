@@ -6,8 +6,7 @@ import {
   nativeTheme,
   dialog,
   powerSaveBlocker,
-  powerMonitor,
-  Notification
+  powerMonitor
   // Notification
 } from 'electron'
 import path, { join } from 'path'
@@ -15,17 +14,19 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { Tab, TimeData } from '@shared/type'
 import {
+  addOtherData,
   addTab,
   addTimeDataToTab,
+  checkUserVerified,
   deleteTab,
   deleteTimeData,
   getAllTabs,
   playAudio,
-  renameTab
+  renameTab,
+  userVerified
 } from './utils'
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 import { projectMusicDirPath } from '@shared/constant'
-import verifyUser from './utils/verifyUser'
 
 // set app name
 app.setName('Bell System')
@@ -35,16 +36,7 @@ nativeTheme.themeSource = 'dark'
 
 //create app music folder
 mkdirSync(projectMusicDirPath, { recursive: true })
-
-// Prevent app suspension
-// powerSaveBlocker.start('prevent-app-suspension')
-
-// const NOTIFICATION_TITLE = 'Basic Notification'
-// const NOTIFICATION_BODY = 'Notification from the Main process'
-
-// function showNotification(): void {
-//   new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
-// }
+addOtherData() //add other data in db
 
 app.on('ready', () => {
   // Prevent display sleep
@@ -56,12 +48,12 @@ app.on('ready', () => {
   powerMonitor.on('suspend', () => {
     powerSaveBlocker.start('prevent-app-suspension')
   })
-  new Notification({
-    title: 'Bell System',
-    subtitle: 'classes',
-    body: `Bell On: 3:21am`,
-    icon: path.join(__dirname, '../../resources/icon.ico')
-  }).show()
+  // new Notification({
+  //   title: 'Bell System',
+  //   subtitle: 'classes',
+  //   body: `Bell On: 3:21am`,
+  //   icon: path.join(__dirname, '../../resources/icon.ico')
+  // }).show()
 })
 
 function createWindow(): void {
@@ -125,8 +117,8 @@ app.whenReady().then(() => {
 
   ipcMain.handle(
     'playAudio',
-    async (_, audiofileName: string, tab_name: string, timedata: TimeData) => {
-      await playAudio(audiofileName, tab_name, timedata)
+    async (_, audioFileName: string, tab_name: string, timeData: TimeData) => {
+      await playAudio(audioFileName, tab_name, timeData)
     }
   )
 
@@ -174,7 +166,9 @@ app.whenReady().then(() => {
     return audioFiles
   })
 
-  ipcMain.handle('userIsVerified', () => verifyUser())
+  ipcMain.handle('userIsVerified', () => userVerified())
+
+  ipcMain.handle('checkUserIsVerified', () => checkUserVerified())
 
   createWindow()
 

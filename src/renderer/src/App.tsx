@@ -1,4 +1,4 @@
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
+import { Box, CircularProgress, createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import Home from './components/pages/home'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import ManageAudioFiles from './components/pages/ManageAudioFiles'
@@ -13,10 +13,39 @@ const darkTheme = createTheme({
 
 function App(): JSX.Element {
   const [isVerified, setIsVerified] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
+    const loadingSetTimeOut = setTimeout(() => {
+      setIsLoading(false)
+    }, 500)
+
     // Check if the user has already verified (from Electron Store)
+    const checkUserVerified = async (): Promise<void> => {
+      const response: boolean = await window.electron.ipcRenderer.invoke('checkUserIsVerified')
+      setIsVerified(response)
+    }
+    checkUserVerified()
+
+    // clear timeout when the component unmounts
+    return (): void => clearTimeout(loadingSetTimeOut)
   }, [])
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          bgcolor: 'black',
+          height: '100vh'
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    )
+  }
 
   return (
     <ThemeProvider theme={darkTheme}>

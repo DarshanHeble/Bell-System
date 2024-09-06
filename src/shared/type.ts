@@ -33,3 +33,9 @@ export type activeTabType = {
 export type TabWithOut_Id = Omit<Tab, '_id'>
 
 export type TabWithRev = Tab & { _rev: string }
+
+export type OtherDataType = {
+  _id: string
+  _rev: string
+  isVerified: boolean
+}

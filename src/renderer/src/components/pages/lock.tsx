@@ -11,8 +11,12 @@ export default function Lock({ setVerified }: LockProps): JSX.Element {
   const [inputPassword, setInputPassword] = useState<string>('')
   const [error, setError] = useState<boolean>(false)
 
-  const handleUnlock = (): void => {
+  const handleUnlock = async (): Promise<void> => {
     if (inputPassword === correctPassword) {
+      const responce = await window.electron.ipcRenderer.invoke('userIsVerified')
+      if (!responce) {
+        toast.error('An Error has occurred while updating the database')
+      }
       toast.success('Password Verified')
       setTimeout(() => {
         setVerified(true) // Update state in parent component
