@@ -25,6 +25,7 @@ import {
 } from './utils'
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 import { projectMusicDirPath } from '@shared/constant'
+import verifyUser from './utils/verifyUser'
 
 // set app name
 app.setName('Bell System')
@@ -172,6 +173,9 @@ app.whenReady().then(() => {
 
     return audioFiles
   })
+
+  ipcMain.handle('userIsVerified', () => verifyUser())
+
   createWindow()
 
   app.on('activate', function () {

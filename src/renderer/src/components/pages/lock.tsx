@@ -1,63 +1,69 @@
 import { useState } from 'react'
 import { TextField, Button, Box, Typography, Paper } from '@mui/material'
+import { toast, Toaster } from 'sonner'
 
 interface LockProps {
   setVerified: (isVerified: boolean) => void
 }
 
 export default function Lock({ setVerified }: LockProps): JSX.Element {
-  const correctPassword = 'mySecretPassword'
+  const correctPassword = 'hello'
   const [inputPassword, setInputPassword] = useState<string>('')
   const [error, setError] = useState<boolean>(false)
 
   const handleUnlock = (): void => {
     if (inputPassword === correctPassword) {
-      console.log('Password verified successfully!')
-      setVerified(true) // Update state in parent component
+      toast.success('Password Verified')
+      setTimeout(() => {
+        setVerified(true) // Update state in parent component
+      }, 1000)
     } else {
       setError(true)
     }
   }
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
-      bgcolor="#f0f0f0"
-      padding={2}
-    >
-      <Paper elevation={3} style={{ padding: '40px', maxWidth: '400px', width: '100%' }}>
-        <Typography variant="h5" align="center" gutterBottom>
-          Password Verification
-        </Typography>
+    <>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+        bgcolor="#0e0e0e"
+        padding={2}
+      >
+        <Paper elevation={3} style={{ padding: '40px', maxWidth: '400px', width: '100%' }}>
+          <Typography variant="h5" align="center" gutterBottom>
+            Password Verification
+          </Typography>
 
-        <TextField
-          fullWidth
-          type="password"
-          label="Enter Password"
-          variant="outlined"
-          value={inputPassword}
-          onChange={(e) => {
-            setInputPassword(e.target.value)
-            setError(false)
-          }}
-          error={error}
-          helperText={error ? 'Incorrect password. Please try again.' : ''}
-          margin="normal"
-        />
+          <TextField
+            fullWidth
+            type="password"
+            label="Enter Password"
+            variant="outlined"
+            value={inputPassword}
+            onChange={(e) => {
+              setInputPassword(e.target.value)
+              setError(false)
+            }}
+            error={error}
+            helperText={error ? 'Incorrect password. Please try again.' : ''}
+            margin="normal"
+          />
 
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          onClick={handleUnlock}
-          style={{ marginTop: '20px' }}
-        >
-          Verify
-        </Button>
-      </Paper>
-    </Box>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={handleUnlock}
+            style={{ marginTop: '20px' }}
+          >
+            Verify
+          </Button>
+        </Paper>
+      </Box>
+      <Toaster richColors />
+    </>
   )
 }

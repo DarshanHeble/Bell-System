@@ -47,7 +47,7 @@ function ManageAudioFiles(): JSX.Element {
   const handleSelectFile = async (): Promise<void> => {
     const filePath = await window.electron.ipcRenderer.invoke('select-music-file')
     if (filePath == null) {
-      toast('something went wrong')
+      toast.error('something went wrong')
     }
     if (filePath) {
       setSelectedFile(filePath)
@@ -57,7 +57,7 @@ function ManageAudioFiles(): JSX.Element {
 
   return (
     <>
-      <Toaster richColors={true} />
+      <Toaster richColors />
       <AppBar position="relative">
         <Toolbar>
           <Tooltip title="Go back">
@@ -74,7 +74,6 @@ function ManageAudioFiles(): JSX.Element {
                 <InfoOutlinedIcon />
               </IconButton>
             </Tooltip>
-            <Button onClick={() => toast('hi')}>hh</Button>
           </Box>
         </Toolbar>
       </AppBar>

@@ -1,6 +1,6 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import Home from './components/pages/home'
-import { HashRouter, Route, Routes, Navigate } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import ManageAudioFiles from './components/pages/ManageAudioFiles'
 import Lock from './components/pages/lock'
 import { useEffect, useState } from 'react'
@@ -25,12 +25,13 @@ function App(): JSX.Element {
         <Routes>
           {/* If the user is verified, redirect to the home page */}
           {isVerified ? (
-            <Route path="*" element={<Navigate to="/home" />} />
+            <>
+              <Route path="/" element={<Home />} />
+              <Route path="/manageAudioFiles" element={<ManageAudioFiles />} />
+            </>
           ) : (
             <>
               <Route path="/" element={<Lock setVerified={setIsVerified} />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/manageAudioFiles" element={<ManageAudioFiles />} />
             </>
           )}
         </Routes>
