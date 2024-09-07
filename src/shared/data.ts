@@ -1,6 +1,6 @@
 import { Tab } from './type'
 
-export const timedata: Tab[] = [
+export const timeData: Tab[] = [
   {
     _id: 'jm,,m',
     tab_name: 'Classes',

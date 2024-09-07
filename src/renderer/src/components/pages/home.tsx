@@ -254,55 +254,18 @@ function Home(): JSX.Element {
 
         {/* alarm content window */}
         <Box sx={{ width: '100%', position: 'relative' }}>
-          {tabs.map((data, index) => (
+          {tabs.map((tabData, index) => (
             <Box
               key={index}
               className="window"
               sx={{
                 position: 'absolute',
                 bgcolor: 'black',
-                zIndex: data._id == activeTab ? 11 : 10
+                zIndex: tabData._id == activeTab ? 11 : 10
               }}
             >
-              {/* {data.data.map((item, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                  position: 'relative',
-                    height: 'max-content'
-                  }}
-                >
-                  <CardActionArea
-                    id="cardBtn"
-                    onContextMenu={handleContextMenu}
-                    onClick={handleContextMenu}
-                  >
-                    <CardContent>
-                      <Box
-                        sx={{ display: 'flex', justifyContent: 'start', alignItems: 'baseline' }}
-                      >
-                        <Typography variant="h3" component="h2" sx={{ fontSize: '3.5rem' }}>
-                          {item.time.hour.toString()}:{item.time.minute.toString().padStart(2, '0')}
-                        </Typography>
-                        <Typography variant="h5" sx={{ ml: 1 }}>
-                          {item.time.period}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography> {item.label}</Typography>
-                        <Typography>{item.music_file_name} </Typography>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          {item.days.map((days, index) => (
-                            <Typography key={index}>{days.day} </Typography>
-                          ))}
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </CardActionArea>
-                  <Switch sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }} />
-                </Card>
-              ))} */}
-              {data.data.length === 0 ? (
+              {/* ..previous code is at last.. */}
+              {tabData.data.length === 0 ? (
                 <Container
                   sx={{
                     height: '100%',
@@ -322,8 +285,14 @@ function Home(): JSX.Element {
                   </Typography>
                 </Container>
               ) : (
-                data.data.map((item, index) => (
-                  <AlarmCard key={index} data={item} onContextMenu={handleContextMenu} />
+                tabData.data.map((item, index) => (
+                  <AlarmCard
+                    key={index}
+                    data={item}
+                    dataIndex={index}
+                    tab_id={tabData._id}
+                    onContextMenu={handleContextMenu}
+                  />
                 ))
               )}
               <Fab
@@ -492,4 +461,45 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
       />
     </Box>
   )
+}
+
+{
+  /* {data.data.map((item, index) => (
+                <Card
+                  key={index}
+                  sx={{
+                  position: 'relative',
+                    height: 'max-content'
+                  }}
+                >
+                  <CardActionArea
+                    id="cardBtn"
+                    onContextMenu={handleContextMenu}
+                    onClick={handleContextMenu}
+                  >
+                    <CardContent>
+                      <Box
+                        sx={{ display: 'flex', justifyContent: 'start', alignItems: 'baseline' }}
+                      >
+                        <Typography variant="h3" component="h2" sx={{ fontSize: '3.5rem' }}>
+                          {item.time.hour.toString()}:{item.time.minute.toString().padStart(2, '0')}
+                        </Typography>
+                        <Typography variant="h5" sx={{ ml: 1 }}>
+                          {item.time.period}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography> {item.label}</Typography>
+                        <Typography>{item.music_file_name} </Typography>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          {item.days.map((days, index) => (
+                            <Typography key={index}>{days.day} </Typography>
+                          ))}
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                  <Switch sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }} />
+                </Card>
+              ))} */
 }

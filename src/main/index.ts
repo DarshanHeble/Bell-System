@@ -23,6 +23,7 @@ import {
   getAllTabs,
   playAudio,
   renameTab,
+  updateSwitch,
   userVerified
 } from './utils'
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
@@ -48,12 +49,6 @@ app.on('ready', () => {
   powerMonitor.on('suspend', () => {
     powerSaveBlocker.start('prevent-app-suspension')
   })
-  // new Notification({
-  //   title: 'Bell System',
-  //   subtitle: 'classes',
-  //   body: `Bell On: 3:21am`,
-  //   icon: path.join(__dirname, '../../resources/icon.ico')
-  // }).show()
 })
 
 function createWindow(): void {
@@ -114,6 +109,9 @@ app.whenReady().then(() => {
 
   ipcMain.handle('addTimeData', (_, _id: string, data: TimeData) => addTimeDataToTab(_id, data))
   ipcMain.handle('deleteTimeData', (_, _id: string, data: TimeData) => deleteTimeData(_id, data))
+  ipcMain.handle('updateSwitch', (_, tab_id: string, dataIndex: number, switchState: boolean) =>
+    updateSwitch(tab_id, dataIndex, switchState)
+  )
 
   ipcMain.handle(
     'playAudio',

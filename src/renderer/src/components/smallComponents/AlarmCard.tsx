@@ -1,16 +1,30 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Box, Card, CardActionArea, CardContent, Typography, Switch } from '@mui/material'
 import { TimeData } from '@shared/type'
 
 interface AlarmCardProps {
   data: TimeData
+  dataIndex: number
+  tab_id: string
   onContextMenu: (event: React.MouseEvent, data: TimeData) => void
 }
 
-const AlarmCard: React.FC<AlarmCardProps> = ({ data, onContextMenu }) => {
+const AlarmCard: React.FC<AlarmCardProps> = ({ data, dataIndex, tab_id, onContextMenu }) => {
+  const [isChecked, setIsChecked] = useState<boolean>(data.switch_state)
+
   const handleContextMenu = (event: React.MouseEvent): void => {
     event.preventDefault()
     onContextMenu(event, data)
+  }
+
+  const handleSwitchOnChange = (): void => {
+    setIsChecked((prevValue) => {
+      const newValue = !prevValue
+      console.log(newValue)
+
+      window.electron.ipcRenderer.invoke('updateSwitch', tab_id, dataIndex, newValue)
+      return newValue
+    })
   }
 
   return (
@@ -41,7 +55,11 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, onContextMenu }) => {
           </Box>
         </CardContent>
       </CardActionArea>
-      <Switch sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }} />
+      <Switch
+        sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
+        checked={isChecked}
+        onChange={handleSwitchOnChange}
+      />
     </Card>
   )
 }
