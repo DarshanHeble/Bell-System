@@ -1,5 +1,13 @@
 import React, { useState } from 'react'
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
+  Button,
+  Box
+} from '@mui/material'
 import { Tab, TabWithOut_Id } from '@shared/type'
 
 interface NewTabDialogProps {
@@ -12,11 +20,11 @@ const NewTabDialog: React.FC<NewTabDialogProps> = ({ open, onClose, onAddTab }) 
   const [newTabName, setNewTabName] = useState('')
 
   const handleAdd = async (): Promise<void> => {
-    const trimedNewTabName = newTabName.trim()
-    if (trimedNewTabName) {
+    const trimmedNewTabName = newTabName.trim()
+    if (trimmedNewTabName) {
       const newTabDataWithOut_Id: TabWithOut_Id = {
-        tab_id: trimedNewTabName,
-        tab_name: trimedNewTabName,
+        tab_id: trimmedNewTabName,
+        tab_name: trimmedNewTabName,
         data: []
       }
 
@@ -36,25 +44,27 @@ const NewTabDialog: React.FC<NewTabDialogProps> = ({ open, onClose, onAddTab }) 
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Add New Tab</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Tab Name"
-          type="text"
-          fullWidth
-          variant="standard"
-          value={newTabName}
-          onChange={(e) => setNewTabName(e.target.value)}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="error">
-          Cancel
-        </Button>
-        <Button onClick={handleAdd}>Add</Button>
-      </DialogActions>
+      <Box sx={{ bgcolor: '#1f1f1f' }}>
+        <DialogTitle>Add New Tab</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Tab Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newTabName}
+            onChange={(e) => setNewTabName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} color="error">
+            Cancel
+          </Button>
+          <Button onClick={handleAdd}>Add</Button>
+        </DialogActions>
+      </Box>
     </Dialog>
   )
 }

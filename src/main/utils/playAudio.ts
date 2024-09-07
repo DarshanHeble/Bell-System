@@ -2,7 +2,7 @@ import { AudioContext } from 'node-web-audio-api'
 import fs from 'fs/promises'
 import path from 'path'
 import { projectMusicDirPath } from '@shared/constant'
-import { Notification } from 'electron'
+import { Notification } from 'electron/main'
 import { TimeData } from '@shared/type'
 
 const audioContext = new AudioContext()
@@ -13,6 +13,13 @@ const playAudio = async (
   timedata: TimeData
 ): Promise<void> => {
   try {
+    // new Notification({
+    //   title: 'Bell System',
+    //   subtitle: 'classes',
+    //   body: `Bell On: 3:21am`,
+    //   icon: path.join(__dirname, '../../resources/icon.ico')
+    // }).show()
+
     const audioFilePath = path.join(projectMusicDirPath, audioFileName)
     const audioBuffer = await loadAudioFile(audioFilePath)
 
@@ -33,8 +40,8 @@ const playAudio = async (
       new Notification({
         title: 'Bell System',
         subtitle: tab_name,
-        body: `Bell On: ${hour}: ${minute} ${period}`,
-        icon: path.join(__dirname, '../../../resources/icon.png')
+        body: `Bell On: ${hour}: ${minute.toString().padStart(2, '0')} ${period}`,
+        icon: path.join(__dirname, '../../resources/icon.png')
       }).show()
     })
   } catch (err) {

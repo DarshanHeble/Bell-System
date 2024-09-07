@@ -42,7 +42,7 @@ function App(): JSX.Element {
           height: '100vh'
         }}
       >
-        <CircularProgress />
+        <CircularProgress size={'6rem'} />
       </Box>
     )
   }

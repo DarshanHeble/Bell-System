@@ -6,11 +6,11 @@ const checkUserVerified = async (): Promise<boolean> => {
     const response = await pdbOther.get<OtherDataType>('other')
     console.log('user', response)
 
-    if (response.isVerified) {
-      return true
-    }
+    // if (response.isVerified) {
+    //   return true
+    // }
 
-    return false
+    return response.isVerified
   } catch (error) {
     console.log('error', error)
     return false

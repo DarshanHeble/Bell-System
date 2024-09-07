@@ -4,8 +4,8 @@ const userVerified = async (): Promise<boolean> => {
   try {
     const response = await pdbOther.get('other').then((doc) => {
       return pdbOther.put({
-        isVerified: true,
-        ...doc
+        ...doc,
+        isVerified: true
       })
     })
     console.log('Success', response)

@@ -28,23 +28,7 @@ interface AddAlarmDialogProps {
 }
 
 const hours = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-const minutes = [
-  '00',
-  '05',
-  '10',
-  '15',
-  '16',
-  '17',
-  '18',
-  '20',
-  '25',
-  '30',
-  '35',
-  '40',
-  '45',
-  '50',
-  '55'
-]
+const minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
 const amPm = ['am', 'pm']
 const daysOfWeek = ['S', 'M', 'Tu', 'W', 'T', 'F', 'Sa']
 // const allSounds: string[] = []
@@ -116,6 +100,34 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
         : [...prevSelectedDays, day]
     )
   }
+  const handleScroll = (e: React.WheelEvent<HTMLButtonElement>, type: 'hour' | 'minute'): void => {
+    // e.preventDefault() // Prevent default scroll behavior
+
+    const change = e.deltaY < 0 ? 1 : -1 // Scroll up or down
+    console.log(change)
+
+    if (type === 'hour') {
+      setHrBtnText((prevHour) => {
+        const newHour = Number(prevHour) + change
+        if (newHour === 0) {
+          return '12'
+        } else if (newHour === 13) {
+          return '01'
+        }
+        return newHour.toString().padStart(2, '0')
+      })
+    } else if (type === 'minute') {
+      setMinBtnText((prevMin) => {
+        const newMin = Number(prevMin) + change
+        if (newMin === -1) {
+          return '60'
+        } else if (newMin === 60) {
+          return '00'
+        }
+        return newMin.toString().padStart(2, '0')
+      })
+    }
+  }
 
   const handleSave = (): void => {
     console.log(hrBtnText, minBtnText, activeAmPm, selectedDays, selectedSound)
@@ -167,7 +179,10 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
               <Button
                 variant="contained"
                 onClick={handleHourClick}
-                onWheel={(e) => console.log('Hour scroll', e)}
+                onWheel={(e) => {
+                  // console.log('Hour scroll', e),
+                  handleScroll(e, 'hour')
+                }}
                 sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem' }}
               >
                 {hrBtnText}
@@ -184,7 +199,10 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
               <Button
                 variant="contained"
                 onClick={handleMinuteClick}
-                onWheel={(e) => console.log('Minute scroll', e)}
+                onWheel={(e) => {
+                  // console.log('Minute scroll', e)
+                  handleScroll(e, 'minute')
+                }}
                 sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem' }}
               >
                 {minBtnText}

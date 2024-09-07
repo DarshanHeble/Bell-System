@@ -13,8 +13,8 @@ export default function Lock({ setVerified }: LockProps): JSX.Element {
 
   const handleUnlock = async (): Promise<void> => {
     if (inputPassword === correctPassword) {
-      const responce = await window.electron.ipcRenderer.invoke('userIsVerified')
-      if (!responce) {
+      const response = await window.electron.ipcRenderer.invoke('userIsVerified')
+      if (!response) {
         toast.error('An Error has occurred while updating the database')
       }
       toast.success('Password Verified')

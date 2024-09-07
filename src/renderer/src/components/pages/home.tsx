@@ -22,6 +22,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import AudioFileOutlinedIcon from '@mui/icons-material/AudioFileOutlined'
+import NotificationsOffRoundedIcon from '@mui/icons-material/NotificationsOffRounded'
 
 import { Tab, TimeData } from '@shared/type'
 import NewTabDialog from '../dialogs/NewTabDialog'
@@ -78,7 +79,7 @@ function Home(): JSX.Element {
   useEffect(() => {
     intervalIdRef.current = setInterval(() => {
       checkTimeMatch(tabsRef.current, activeTabRef.current)
-    }, 30000) // Check every second
+    }, 1000) // Check every second
 
     return (): void => {
       if (intervalIdRef.current) {
@@ -235,9 +236,6 @@ function Home(): JSX.Element {
             </Box>
           )}
 
-          {/* <Button variant="contained" sx={{ width: 'max-content' }}>
-            Manage files
-          </Button> */}
           <Divider sx={{ mt: 'auto' }} />
           <List>
             <ListItem disablePadding sx={{ minWidth: 'max-content' }}>
@@ -314,7 +312,14 @@ function Home(): JSX.Element {
                     position: 'absolute'
                   }}
                 >
-                  <Typography variant="h3">No bells 🔕 to show.</Typography>
+                  <Typography
+                    variant="h3"
+                    sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                  >
+                    No bells
+                    <NotificationsOffRoundedIcon sx={{ fontSize: '4rem', color: 'gold' }} /> to
+                    show.
+                  </Typography>
                 </Container>
               ) : (
                 data.data.map((item, index) => (

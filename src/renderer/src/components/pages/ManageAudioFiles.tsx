@@ -26,7 +26,7 @@ import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined'
 
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { toast, Toaster } from 'sonner'
+import { Toaster } from 'sonner'
 
 function ManageAudioFiles(): JSX.Element {
   const navigate = useNavigate()
@@ -46,9 +46,9 @@ function ManageAudioFiles(): JSX.Element {
 
   const handleSelectFile = async (): Promise<void> => {
     const filePath = await window.electron.ipcRenderer.invoke('select-music-file')
-    if (filePath == null) {
-      toast.error('something went wrong')
-    }
+    // if (filePath == null) {
+    //   toast.error('something went wrong')
+    // }
     if (filePath) {
       setSelectedFile(filePath)
       // setMusicFiles((prev) => prev.push(filePath))
