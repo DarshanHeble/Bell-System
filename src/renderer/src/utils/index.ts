@@ -19,10 +19,18 @@ export const checkTimeMatch = (tabs: Tab[], activeTab: string): void => {
         const currentHour = now.getHours()
         const currentPeriod = currentHour >= 12 ? 'pm' : 'am'
         const formattedHour = currentHour % 12 || 12 // Convert to 12-hour format
+        const currentDay = now.getDay()
 
-        if (hour === formattedHour && minute === currentMinute && period === currentPeriod) {
+        if (
+          hour === formattedHour &&
+          minute === currentMinute &&
+          period === currentPeriod &&
+          item.days[currentDay].active === true
+        ) {
           isPlayingAudio = true
           console.log(`Time matched for label: ${item.label} at ${hour}:${minute} ${period}`)
+
+          // call API for playing audio
           await window.electron.ipcRenderer.invoke(
             'playAudio',
             item.music_file_name,
