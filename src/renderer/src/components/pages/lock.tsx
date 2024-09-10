@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { TextField, Button, Box, Typography, Paper } from '@mui/material'
 import { toast, Toaster } from 'sonner'
+import { APP_PASSWORD } from '@shared/password'
 
 interface LockProps {
   setVerified: (isVerified: boolean) => void
 }
 
 export default function Lock({ setVerified }: LockProps): JSX.Element {
-  const correctPassword = 'hello'
   const [inputPassword, setInputPassword] = useState<string>('')
   const [error, setError] = useState<boolean>(false)
 
   const handleUnlock = async (): Promise<void> => {
-    if (inputPassword === correctPassword) {
+    if (inputPassword === APP_PASSWORD) {
       const response = await window.electron.ipcRenderer.invoke('userIsVerified')
       if (!response) {
         toast.error('An Error has occurred while updating the database')
