@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.electron.ap${name}
 productName: Bell System
 directories:
   buildResources: build
@@ -14,11 +14,22 @@ asarUnpack:
 win:
   executableName: Bell System
   icon: resources/icon.ico
+  target:
+    - nsis
+  # arch:
+  #   - x64
+  #   - ia32
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  createStartMenuShortcut: true
+  allowToChangeInstallationDirectory: true
+  allowElevation: true
+  oneClick: false
+  perMachine: false
+
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -38,7 +49,7 @@ linux:
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
-npmRebuild: false
+npmRebuild: true
 publish:
   provider: generic
   url: https://example.com/auto-updates
