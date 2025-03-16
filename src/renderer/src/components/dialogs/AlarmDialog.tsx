@@ -19,6 +19,7 @@ import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined'
 
 import { getCurrentTime } from '@renderer/utils'
 import { TimeData } from '@shared/type'
+import { v4 } from 'uuid'
 
 interface AddAlarmDialogProps {
   open: boolean
@@ -130,9 +131,10 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
   }
 
   const handleSave = (): void => {
-    console.log(hrBtnText, minBtnText, activeAmPm, selectedDays, selectedSound)
+    // console.log(hrBtnText, minBtnText, activeAmPm, selectedDays, selectedSound)
 
     const newData: TimeData = {
+      id: v4(),
       time: { hour: Number(hrBtnText), minute: Number(minBtnText), period: activeAmPm },
       label: label,
       music_file_name: selectedSound ? selectedSound : '',
@@ -142,15 +144,6 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
       })),
       switch_state: true
     }
-
-    // const tabIndex = timedata.findIndex((tab) => tab.tab_id === activeTab)
-
-    // if (tabIndex == -1) {
-    //   console.error('index not found')
-    // } else {
-    //   timedata[tabIndex].data.push(newData)
-    //   timedata[tabIndex].data.sort()
-    // }
 
     onTimeAdd(activeTab, newData)
 

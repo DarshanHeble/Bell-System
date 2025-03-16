@@ -28,6 +28,7 @@ import {
 } from './utils'
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 import { projectMusicDirPath } from '@shared/constant'
+import migrateData from './utils/migrateData'
 
 // set app name
 app.setName('Bell System')
@@ -38,6 +39,7 @@ nativeTheme.themeSource = 'dark'
 //create app music folder
 mkdirSync(projectMusicDirPath, { recursive: true })
 addOtherData() //add other data in db
+migrateData()
 
 app.on('ready', () => {
   // Prevent display sleep

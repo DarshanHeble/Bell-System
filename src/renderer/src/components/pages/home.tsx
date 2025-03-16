@@ -5,7 +5,6 @@ import {
   Container,
   Divider,
   Fab,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -15,23 +14,21 @@ import {
   MenuItem,
   Typography
 } from '@mui/material'
-
-import AlarmIcon from '@mui/icons-material/Alarm'
-import AddIcon from '@mui/icons-material/Add'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
-import AudioFileOutlinedIcon from '@mui/icons-material/AudioFileOutlined'
-import NotificationsOffRoundedIcon from '@mui/icons-material/NotificationsOffRounded'
-
+import {
+  Add,
+  DeleteOutlined,
+  AudioFileOutlined,
+  NotificationsOffRounded
+} from '@mui/icons-material'
 import { Tab, TimeData } from '@shared/type'
 import NewTabDialog from '../dialogs/NewTabDialog'
 import AlarmDialog from '../dialogs/AlarmDialog'
 import { checkTimeMatch } from '@renderer/utils'
-import RenameTabDialog from '../dialogs/RenameTabDialog'
-
 import { useNavigate } from 'react-router-dom'
 import AlarmCard from '../smallComponents/AlarmCard'
+import HoverableSidebarBox from '../smallComponents/HoverableSidebarBox'
+import { sortTimeData } from '@shared/utils'
+import { v4 } from 'uuid'
 
 function Home(): JSX.Element {
   const navigate = useNavigate()
@@ -58,14 +55,14 @@ function Home(): JSX.Element {
 
   const handleContextMenu = (event: React.MouseEvent, timeData: TimeData): void => {
     event.preventDefault()
-    console.log(timeData)
+    // console.log(timeData)
 
     setCardContextMenu({
       mouseX: event.clientX + 2,
       mouseY: event.clientY - 6,
       data: timeData
     })
-    console.log(cardContextMenu)
+    // console.log(cardContextMenu)
   }
 
   useEffect(() => {
@@ -93,7 +90,7 @@ function Home(): JSX.Element {
     const fetchTabs = async (): Promise<void> => {
       try {
         const fetchedTabs: Tab[] = await window.electron.ipcRenderer.invoke('getTabs')
-        console.log('fetchedTabs', fetchedTabs)
+        // console.log('fetchedTabs', fetchedTabs)
         setTabs(fetchedTabs)
 
         if (fetchedTabs.length > 0) {
@@ -108,9 +105,9 @@ function Home(): JSX.Element {
     fetchTabs()
   }, [])
 
-  useEffect(() => {
-    console.log('Updated cardContextMenu:', cardContextMenu)
-  }, [cardContextMenu])
+  // useEffect(() => {
+  //   console.log('Updated cardContextMenu:', cardContextMenu)
+  // }, [cardContextMenu])
 
   const handleAddTab = (newTabData: Tab): void => {
     tabs.push(newTabData)
@@ -141,55 +138,66 @@ function Home(): JSX.Element {
     // console.log(_id, newTimeData)
     const tabIndex = tabs.findIndex((tab) => tab._id === activeTab)
 
+    newTimeData = {
+      id: newTimeData.id || v4(), // make sure id is passed
+      ...newTimeData
+    }
+
     if (tabIndex == -1) {
       console.error('index not found')
     } else {
-      tabs[tabIndex].data.push(newTimeData)
-      tabs[tabIndex].data.sort()
+      tabs[tabIndex].data = sortTimeData([...tabs[tabIndex].data, newTimeData])
     }
+
     window.electron.ipcRenderer.invoke('addTimeData', _id, newTimeData)
   }
 
   const handleTimeDelete = async (): Promise<void> => {
-    console.log(cardContextMenu)
+    // console.log(cardContextMenu)
 
     if (cardContextMenu) {
       const { data } = cardContextMenu
-      console.log(data)
+      // console.log(data)
       await window.electron.ipcRenderer.invoke('deleteTimeData', activeTab, data)
 
-      // Update the tabs state
-      setTabs((prevTabs) => {
-        // Find the index of the active tab
-        const tabIndex = prevTabs.findIndex((tab) => tab._id === activeTab)
+      if (data.id) {
+        console.log('id available so delete it with id')
 
-        // If the tab is found
-        if (tabIndex !== -1) {
-          // Create a copy of the tabs array
-          const updatedTabs = [...prevTabs]
+        setTabs((prevTabs) => prevTabs.filter((tabs) => tabs._id != data.id))
+      } else {
+        // Update the tabs state
+        setTabs((prevTabs) => {
+          // Find the index of the active tab
+          const tabIndex = prevTabs.findIndex((tab) => tab._id === activeTab)
 
-          // Filter out the specific TimeData from the tab's data array
-          const updatedData = updatedTabs[tabIndex].data.filter(
-            (timeData) =>
-              timeData.time.hour !== data.time.hour ||
-              timeData.time.minute !== data.time.minute ||
-              timeData.time.period !== data.time.period ||
-              timeData.label !== data.label
-          )
+          // If the tab is found
+          if (tabIndex !== -1) {
+            // Create a copy of the tabs array
+            const updatedTabs = [...prevTabs]
 
-          // Update the tab's data array with the filtered data
-          updatedTabs[tabIndex] = {
-            ...updatedTabs[tabIndex],
-            data: updatedData
+            // Filter out the specific TimeData from the tab's data array
+            const updatedData = updatedTabs[tabIndex].data.filter(
+              (timeData) =>
+                timeData.time.hour !== data.time.hour ||
+                timeData.time.minute !== data.time.minute ||
+                timeData.time.period !== data.time.period ||
+                timeData.label !== data.label
+            )
+
+            // Update the tab's data array with the filtered data
+            updatedTabs[tabIndex] = {
+              ...updatedTabs[tabIndex],
+              data: updatedData
+            }
+
+            // Return the updated tabs array to update the state
+            return updatedTabs
           }
 
-          // Return the updated tabs array to update the state
-          return updatedTabs
-        }
-
-        // If the tab is not found, return the previous tabs state
-        return prevTabs
-      })
+          // If the tab is not found, return the previous tabs state
+          return prevTabs
+        })
+      }
     }
 
     setCardContextMenu(null)
@@ -198,7 +206,6 @@ function Home(): JSX.Element {
   return (
     <>
       <Box sx={{ display: 'flex', height: '100vh' }}>
-        {/* alarm sidebar */}
         <Box
           sx={{
             display: 'flex',
@@ -206,13 +213,11 @@ function Home(): JSX.Element {
             gap: 3,
             p: '1rem',
             bgcolor: '#202020'
-            // width: '12rem'
           }}
         >
-          {/* new button */}
           <Button
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={<Add />}
             onClick={() => setDialogOpen(true)}
             sx={{ borderRadius: 5, textTransform: 'none', width: 'fit-content' }}
           >
@@ -235,7 +240,6 @@ function Home(): JSX.Element {
               ))}
             </Box>
           )}
-
           <Divider sx={{ mt: 'auto' }} />
           <List>
             <ListItem disablePadding sx={{ minWidth: 'max-content' }}>
@@ -244,7 +248,7 @@ function Home(): JSX.Element {
                 onClick={() => navigate('/manageAudioFiles')}
               >
                 <ListItemIcon>
-                  <AudioFileOutlinedIcon />
+                  <AudioFileOutlined />
                 </ListItemIcon>
                 <ListItemText primary="Manage files" sx={{ textAlign: 'left' }} />
               </ListItemButton>
@@ -280,8 +284,7 @@ function Home(): JSX.Element {
                     sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                   >
                     No bells
-                    <NotificationsOffRoundedIcon sx={{ fontSize: '4rem', color: 'gold' }} /> to
-                    show.
+                    <NotificationsOffRounded sx={{ fontSize: '4rem', color: 'gold' }} /> to show.
                   </Typography>
                 </Container>
               ) : (
@@ -300,7 +303,7 @@ function Home(): JSX.Element {
                 sx={{ position: 'fixed', bottom: '3rem', right: '3rem', textTransform: 'none' }}
                 onClick={handleOpen}
               >
-                <AddIcon sx={{ mr: 1 }} /> New Alarm
+                <Add sx={{ mr: 1 }} /> New Alarm
               </Fab>
             </Box>
           ))}
@@ -329,7 +332,7 @@ function Home(): JSX.Element {
         }
       >
         <MenuItem onClick={handleTimeDelete}>
-          <DeleteOutlinedIcon sx={{ mr: 1 }} /> Delete
+          <DeleteOutlined sx={{ mr: 1 }} /> Delete
         </MenuItem>
       </Menu>
     </>
@@ -337,169 +340,3 @@ function Home(): JSX.Element {
 }
 
 export default Home
-
-interface HoverableSidebarBoxProps {
-  data: Tab
-  activeTab: string
-  setActiveTab: (id: string) => void
-  onTabDelete: (_id: string) => void
-  onTabRename: (tabName: string, newTabName: string) => void
-}
-
-const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
-  data,
-  activeTab,
-  setActiveTab,
-  onTabDelete,
-  onTabRename
-}) => {
-  const [isHovered, setIsHovered] = useState(false)
-  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
-  const [openSidebaranchorEl, setOpenSidebaranchorEl] = useState<null | HTMLElement>(null)
-  const openSidebarTabMenu = Boolean(openSidebaranchorEl)
-
-  const handleClick = (event): void => {
-    setOpenSidebaranchorEl(event.currentTarget)
-  }
-
-  const handleClose = (): void => {
-    setOpenSidebaranchorEl(null)
-  }
-
-  const EditTabName = (): void => {
-    setRenameDialogOpen(true)
-    handleClose()
-  }
-
-  const DeleteTab = async (_id: string): Promise<void> => {
-    onTabDelete(_id)
-    // API for deleting a tab
-    await window.electron.ipcRenderer.invoke('deleteTab', _id)
-    handleClose()
-  }
-
-  const tabRename = async (_id: string, newTabName: string): Promise<void> => {
-    // console.log(oldTab_name, newTabName)
-    // await window.electron.ipcRenderer.invoke('renameTab', oldTab_name, newTabName)
-    onTabRename(_id, newTabName)
-  }
-  return (
-    <Box
-      sx={{
-        position: 'relative',
-        width: '100%'
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onContextMenu={() => console.log('contect menu')}
-    >
-      <Button
-        variant="contained"
-        startIcon={<AlarmIcon />}
-        onClick={() => setActiveTab(data._id)}
-        sx={{
-          borderRadius: 5,
-          textTransform: 'none',
-          justifyContent: 'start',
-          bgcolor: data._id === activeTab ? '' : 'white',
-          zIndex: 3,
-          width: '100%'
-        }}
-      >
-        {data.tab_name}
-      </Button>
-      {isHovered && (
-        <IconButton
-          id="sidebarMoreIcon"
-          aria-controls={openSidebarTabMenu ? 'basic-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={openSidebarTabMenu ? 'true' : undefined}
-          onClick={handleClick}
-          sx={{
-            color: 'black',
-            position: 'absolute',
-            right: 0,
-            zIndex: 4
-          }}
-        >
-          <MoreVertIcon />
-        </IconButton>
-      )}
-
-      {/* Menu  */}
-      <Menu
-        id="basic-menu"
-        open={openSidebarTabMenu}
-        anchorEl={openSidebaranchorEl}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'sidebarMoreIcon'
-        }}
-      >
-        <MenuItem onClick={EditTabName} sx={{ gap: '12px' }}>
-          <EditOutlinedIcon />
-          Rename
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          onClick={() => {
-            // todo: _rev
-            DeleteTab(data._id)
-          }}
-          sx={{ gap: '12px' }}
-        >
-          <DeleteOutlinedIcon />
-          Delete
-        </MenuItem>
-      </Menu>
-      <RenameTabDialog
-        open={renameDialogOpen}
-        onClose={() => setRenameDialogOpen(false)}
-        _id={data._id}
-        oldTabName={data.tab_name}
-        onRenameTab={tabRename}
-      />
-    </Box>
-  )
-}
-
-{
-  /* {data.data.map((item, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                  position: 'relative',
-                    height: 'max-content'
-                  }}
-                >
-                  <CardActionArea
-                    id="cardBtn"
-                    onContextMenu={handleContextMenu}
-                    onClick={handleContextMenu}
-                  >
-                    <CardContent>
-                      <Box
-                        sx={{ display: 'flex', justifyContent: 'start', alignItems: 'baseline' }}
-                      >
-                        <Typography variant="h3" component="h2" sx={{ fontSize: '3.5rem' }}>
-                          {item.time.hour.toString()}:{item.time.minute.toString().padStart(2, '0')}
-                        </Typography>
-                        <Typography variant="h5" sx={{ ml: 1 }}>
-                          {item.time.period}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography> {item.label}</Typography>
-                        <Typography>{item.music_file_name} </Typography>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          {item.days.map((days, index) => (
-                            <Typography key={index}>{days.day} </Typography>
-                          ))}
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </CardActionArea>
-                  <Switch sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }} />
-                </Card>
-              ))} */
-}

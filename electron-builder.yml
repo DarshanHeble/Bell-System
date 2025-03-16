@@ -1,4 +1,4 @@
-appId: com.electron.ap${name}
+appId: com.electron.app
 productName: Bell System
 directories:
   buildResources: build

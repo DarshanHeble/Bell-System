@@ -9,6 +9,7 @@ import {
   Box
 } from '@mui/material'
 import { Tab, TabWithOut_Id } from '@shared/type'
+import { capitalizeString } from '@renderer/utils'
 
 interface NewTabDialogProps {
   open: boolean
@@ -20,7 +21,8 @@ const NewTabDialog: React.FC<NewTabDialogProps> = ({ open, onClose, onAddTab }) 
   const [newTabName, setNewTabName] = useState('')
 
   const handleAdd = async (): Promise<void> => {
-    const trimmedNewTabName = newTabName.trim()
+    const trimmedNewTabName = capitalizeString(newTabName.trim()) //capitalize and format it
+
     if (trimmedNewTabName) {
       const newTabDataWithOut_Id: TabWithOut_Id = {
         tab_id: trimmedNewTabName,
@@ -44,7 +46,7 @@ const NewTabDialog: React.FC<NewTabDialogProps> = ({ open, onClose, onAddTab }) 
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <Box sx={{ bgcolor: '#1f1f1f' }}>
+      <Box component={'form'} sx={{ bgcolor: '#121212' }} onSubmit={handleAdd}>
         <DialogTitle>Add New Tab</DialogTitle>
         <DialogContent>
           <TextField
@@ -52,10 +54,11 @@ const NewTabDialog: React.FC<NewTabDialogProps> = ({ open, onClose, onAddTab }) 
             margin="dense"
             label="Tab Name"
             type="text"
-            fullWidth
-            variant="standard"
+            variant="outlined"
             value={newTabName}
             onChange={(e) => setNewTabName(e.target.value)}
+            fullWidth
+            required
           />
         </DialogContent>
         <DialogActions>

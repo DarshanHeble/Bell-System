@@ -66,3 +66,8 @@ export const getCurrentTime = (): Time => {
     period: isPm ? 'pm' : 'am'
   }
 }
+
+export const capitalizeString = (str: string): string => {
+  if (!str) return ''
+  return str.trim().charAt(0).toUpperCase() + str.trim().slice(1).toLowerCase()
+}
