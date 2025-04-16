@@ -1,5 +1,5 @@
 import { Tab, TimeData } from '@shared/type'
-import { pdbBell } from '../pouchdb'
+import { pdbBell } from '../../pouchdb'
 
 // Function to add TimeData to a specific Tab
 export const addTimeDataToTab = async (_id: string, timeData: TimeData): Promise<void> => {

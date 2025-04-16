@@ -1,5 +1,5 @@
 import { Tab } from '@shared/type'
-import { pdbBell } from '../pouchdb'
+import { pdbBell } from '../../pouchdb'
 import { sortTimeData } from '@shared/utils'
 
 // Function to get all data from PouchDB

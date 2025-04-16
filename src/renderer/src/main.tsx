@@ -16,6 +16,13 @@ const darkTheme = createTheme({
           textTransform: 'none'
         }
       }
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundImage: 'none'
+        }
+      }
     }
   }
 })

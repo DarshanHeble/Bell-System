@@ -23,6 +23,7 @@ import {
   getAllTabs,
   playAudio,
   renameTab,
+  setActiveTab,
   updateSwitch,
   userVerified
 } from './utils'
@@ -106,13 +107,16 @@ app.whenReady().then(() => {
   ipcMain.handle('renameTab', (_, _id: string, newTabName: string) => {
     renameTab(_id, newTabName)
   })
+  ipcMain.handle('setActiveTab', (_, activeTabId: string, inActiveTabId: string) => {
+    setActiveTab(activeTabId, inActiveTabId)
+  })
 
   ipcMain.handle('getTabs', () => getAllTabs())
 
   ipcMain.handle('addTimeData', (_, _id: string, data: TimeData) => addTimeDataToTab(_id, data))
   ipcMain.handle('deleteTimeData', (_, _id: string, data: TimeData) => deleteTimeData(_id, data))
-  ipcMain.handle('updateSwitch', (_, tab_id: string, dataIndex: number, switchState: boolean) =>
-    updateSwitch(tab_id, dataIndex, switchState)
+  ipcMain.handle('updateSwitch', (_, tab_id: string, timeDataID: string, switchState: boolean) =>
+    updateSwitch(tab_id, timeDataID, switchState)
   )
 
   ipcMain.handle(

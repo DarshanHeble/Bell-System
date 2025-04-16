@@ -38,7 +38,7 @@ const RenameTabDialog: React.FC<RenameTabDialogProps> = ({
           label="Tab Name"
           type="text"
           fullWidth
-          variant="standard"
+          variant="outlined"
           value={newTabName}
           onChange={(e) => setNewTabName(e.target.value)}
         />

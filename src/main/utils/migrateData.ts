@@ -1,5 +1,5 @@
 import { v4 } from 'uuid'
-import getAllTabs from './getAllTabs'
+import getAllTabs from './tabs/getAllTabs'
 
 const migrateData = async (): Promise<void> => {
   try {

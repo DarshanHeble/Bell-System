@@ -1,5 +1,5 @@
 import { TabWithRev, TimeData } from '@shared/type'
-import { pdbBell } from '../pouchdb'
+import { pdbBell } from '../../pouchdb'
 
 const deleteTimeData = async (_id: string, timeData: TimeData): Promise<void> => {
   try {

@@ -20,8 +20,9 @@ export type TimeData = {
 
 export type Tab = {
   _id: string
-  // _rev: string
+  _rev?: string
   tab_name: string
+  isActive?: boolean
   tab_id: string
   data: TimeData[]
 }

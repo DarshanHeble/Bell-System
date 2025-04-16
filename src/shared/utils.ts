@@ -14,3 +14,8 @@ const convertToMinutes = (hour: number, minute: number, period: 'am' | 'pm'): nu
   const totalHour = period === 'pm' ? (hour % 12) + 12 : hour % 12
   return totalHour * 60 + minute
 }
+
+export const capitalizeString = (str: string): string => {
+  if (!str) return ''
+  return str.trim().charAt(0).toUpperCase() + str.trim().slice(1).toLowerCase()
+}

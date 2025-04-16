@@ -1,4 +1,4 @@
-import { pdbBell } from '../pouchdb'
+import { pdbBell } from '../../pouchdb'
 
 const deleteTab = async (_id: string): Promise<void> => {
   try {

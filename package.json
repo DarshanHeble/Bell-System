@@ -28,6 +28,7 @@
     "@fontsource/roboto": "^5.0.13",
     "@mui/icons-material": "^5.15.21",
     "@mui/material": "^5.15.21",
+    "fastpriorityqueue": "^0.7.5",
     "node-web-audio-api": "^0.21.1",
     "pouchdb": "^9.0.0",
     "react-router-dom": "^6.25.1",

@@ -1,4 +1,4 @@
-import { pdbBell } from '../pouchdb'
+import { pdbBell } from '../../pouchdb'
 
 export const renameTab = async (_id: string, newTabName: string): Promise<void> => {
   try {

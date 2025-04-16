@@ -41,6 +41,7 @@ function Home(): JSX.Element {
   // const [, SetData] = useState<Tab[]>(timedata)
   const [tabs, setTabs] = useState<Tab[]>([])
   const [activeTab, setActiveTab] = useState<string>('')
+  // const [previousActiveTab, setPreviousActiveTab] = useState<string>('')
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const tabsRef = useRef(tabs) // Use ref to store the latest tabs state
@@ -71,6 +72,13 @@ function Home(): JSX.Element {
 
   useEffect(() => {
     activeTabRef.current = activeTab
+    // const activeTabIndex = tabs.findIndex((tab) => {
+    //   tab._id == activeTab
+    // })
+
+    // if (activeTabIndex) {
+
+    // }
   }, [activeTab])
 
   useEffect(() => {
@@ -268,7 +276,6 @@ function Home(): JSX.Element {
                 zIndex: tabData._id == activeTab ? 11 : 10
               }}
             >
-              {/* ..previous code is at last.. */}
               {tabData.data.length === 0 ? (
                 <Container
                   sx={{
@@ -292,7 +299,6 @@ function Home(): JSX.Element {
                   <AlarmCard
                     key={index}
                     data={item}
-                    dataIndex={index}
                     tab_id={tabData._id}
                     onContextMenu={handleContextMenu}
                   />

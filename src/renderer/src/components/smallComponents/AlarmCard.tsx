@@ -4,12 +4,11 @@ import { TimeData } from '@shared/type'
 
 interface AlarmCardProps {
   data: TimeData
-  dataIndex: number
   tab_id: string
   onContextMenu: (event: React.MouseEvent, data: TimeData) => void
 }
 
-const AlarmCard: React.FC<AlarmCardProps> = ({ data, dataIndex, tab_id, onContextMenu }) => {
+const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) => {
   const [isChecked, setIsChecked] = useState<boolean>(data.switch_state)
 
   const handleContextMenu = (event: React.MouseEvent): void => {
@@ -22,7 +21,7 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, dataIndex, tab_id, onContex
       const newValue = !prevValue
       console.log(newValue)
 
-      window.electron.ipcRenderer.invoke('updateSwitch', tab_id, dataIndex, newValue)
+      window.electron.ipcRenderer.invoke('updateSwitch', tab_id, data.id, newValue)
       return newValue
     })
   }
