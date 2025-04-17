@@ -2,7 +2,7 @@ import { app } from 'electron'
 import path from 'path'
 
 export const appDirName = 'BellSystem'
-export const pbellDbName = 'bellData'
+export const pBellDbName = 'bellData'
 export const pOtherDbName = 'OtherData'
 export const appMusicDirName = 'BellSystem'
 
@@ -13,7 +13,7 @@ export const userDataPath = app.getPath('userData')
 export const projectDirPath = path.join(userDataPath, appDirName)
 
 // path to the project Bell data base
-export const pdbBellFilePath = path.join(projectDirPath, pbellDbName)
+export const pdbBellFilePath = path.join(projectDirPath, pBellDbName)
 
 // path to the other data of the project
 export const pdbOtherFilePath = path.join(projectDirPath, pOtherDbName)

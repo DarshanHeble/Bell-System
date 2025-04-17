@@ -10,7 +10,7 @@ const audioContext = new AudioContext()
 const playAudio = async (
   audioFileName: string,
   tab_name: string,
-  timedata: TimeData
+  timeData: TimeData
 ): Promise<void> => {
   try {
     // new Notification({
@@ -27,7 +27,7 @@ const playAudio = async (
     audioSource.buffer = audioBuffer
     audioSource.connect(audioContext.destination)
 
-    const { hour, minute, period } = timedata.time
+    const { hour, minute, period } = timeData.time
 
     // Use a single promise-based event listener
     return new Promise<void>((resolve) => {
@@ -53,7 +53,7 @@ const playAudio = async (
 const loadAudioFile = async (filePath: string): Promise<AudioBuffer> => {
   try {
     const data = await fs.readFile(filePath)
-    return await audioContext.decodeAudioData(data.buffer)
+    return await audioContext.decodeAudioData(new Uint8Array(data).buffer)
   } catch (err) {
     console.error('Error loading audio file:', err)
     throw err

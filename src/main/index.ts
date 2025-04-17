@@ -2,34 +2,20 @@ import {
   app,
   shell,
   BrowserWindow,
-  ipcMain,
   nativeTheme,
-  dialog,
   powerSaveBlocker,
   powerMonitor
   // Notification
 } from 'electron'
-import path, { join } from 'path'
+import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { Tab, TimeData } from '@shared/type'
-import {
-  addOtherData,
-  addTab,
-  addTimeDataToTab,
-  checkUserVerified,
-  deleteTab,
-  deleteTimeData,
-  getAllTabs,
-  playAudio,
-  renameTab,
-  setActiveTab,
-  updateSwitch,
-  userVerified
-} from './utils'
-import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
+
+import { addOtherData } from './utils'
+import { mkdirSync } from 'fs'
 import { projectMusicDirPath } from '@shared/constant'
 import migrateData from './utils/migrateData'
+import setupIpcHandlers from './setupIpcHandlers'
 
 // set app name
 app.setName('Bell System')
@@ -101,78 +87,10 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-  ipcMain.handle('addTab', (_, tabData: Tab) => addTab(tabData))
-  ipcMain.handle('deleteTab', (_, _id: string) => deleteTab(_id))
-  ipcMain.handle('renameTab', (_, _id: string, newTabName: string) => {
-    renameTab(_id, newTabName)
-  })
-  ipcMain.handle('setActiveTab', (_, activeTabId: string, inActiveTabId: string) => {
-    setActiveTab(activeTabId, inActiveTabId)
-  })
+  // ipcMain.on('ping', () => console.log('pong'))
 
-  ipcMain.handle('getTabs', () => getAllTabs())
-
-  ipcMain.handle('addTimeData', (_, _id: string, data: TimeData) => addTimeDataToTab(_id, data))
-  ipcMain.handle('deleteTimeData', (_, _id: string, data: TimeData) => deleteTimeData(_id, data))
-  ipcMain.handle('updateSwitch', (_, tab_id: string, timeDataID: string, switchState: boolean) =>
-    updateSwitch(tab_id, timeDataID, switchState)
-  )
-
-  ipcMain.handle(
-    'playAudio',
-    async (_, audioFileName: string, tab_name: string, timeData: TimeData) => {
-      await playAudio(audioFileName, tab_name, timeData)
-    }
-  )
-
-  ipcMain.handle('select-music-file', async () => {
-    try {
-      const result = await dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
-      })
-
-      if (result.canceled) {
-        return null
-      } else {
-        const filePath = result.filePaths[0]
-        const destinationPath = path.join(projectMusicDirPath, path.basename(filePath))
-
-        // Ensure the music directory exists
-        mkdirSync(projectMusicDirPath, { recursive: true })
-
-        // Copy the file
-        copyFileSync(filePath, destinationPath)
-
-        return destinationPath
-      }
-    } catch (error) {
-      console.error('Error selecting and copying music file:', error)
-      return null
-    }
-  })
-
-  ipcMain.handle('get-music-files', async () => {
-    // Ensure the directory exists
-    if (!existsSync(projectMusicDirPath)) {
-      return []
-    }
-
-    // Read the directory contents
-    const files = readdirSync(projectMusicDirPath)
-    console.log('Got this files', files)
-
-    // Filter for audio files only
-    const audioFiles = files.filter((file) => /\.(mp3|wav|ogg)$/i.test(file))
-    console.log('filtered files', audioFiles)
-
-    return audioFiles
-  })
-
-  ipcMain.handle('userIsVerified', () => userVerified())
-
-  ipcMain.handle('checkUserIsVerified', () => checkUserVerified())
+  // Setup IPC handlers
+  setupIpcHandlers()
 
   createWindow()
 

@@ -1,5 +1,4 @@
 import {
-  AppBar,
   Box,
   Button,
   Container,
@@ -18,23 +17,30 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined'
-import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined'
-// import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
+import {
+  ArrowBackOutlined,
+  DeleteOutlined,
+  InfoOutlined,
+  MusicNoteOutlined,
+  UploadFileOutlined
+} from '@mui/icons-material'
 
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Toaster } from 'sonner'
+import ConfirmationDialog from '../dialogs/ConfirmationDialog'
+import { deleteAudioFile, renameAudioFile } from '@renderer/api'
+import NameDialog from '../dialogs/NameDialog'
 
 function ManageAudioFiles(): JSX.Element {
   const navigate = useNavigate()
 
   const [helpOpen, setHelpOpen] = useState(false)
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+  const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
-  const [music_files, setMusicFiles] = useState<string[]>([])
-  const [, setSelectedFile] = useState<string | null>(null)
+  const [musicFiles, setMusicFiles] = useState<string[]>([])
+  const [selectedFile, setSelectedFile] = useState<string | null>(null)
 
   useEffect(() => {
     const getMusicFiles = async (): Promise<void> => {
@@ -45,60 +51,65 @@ function ManageAudioFiles(): JSX.Element {
   }, [])
 
   const handleSelectFile = async (): Promise<void> => {
-    const filePath = await window.electron.ipcRenderer.invoke('select-music-file')
+    const fileName = await window.electron.ipcRenderer.invoke('select-music-file')
     // if (filePath == null) {
     //   toast.error('something went wrong')
     // }
-    if (filePath) {
-      setSelectedFile(filePath)
-      // setMusicFiles((prev) => prev.push(filePath))
-    }
+    setMusicFiles((prev) => [...prev, fileName])
   }
 
   return (
     <>
       <Toaster richColors />
-      <AppBar position="relative">
-        <Toolbar>
-          <Tooltip title="Go back">
-            <IconButton size="large" onClick={() => navigate('/')}>
-              <ArrowBackOutlinedIcon />
+      <Toolbar sx={{ backgroundColor: '#202020' }}>
+        <Tooltip title="Go back">
+          <IconButton size="large" onClick={() => navigate('/')}>
+            <ArrowBackOutlined />
+          </IconButton>
+        </Tooltip>
+        <Typography variant="h6" sx={{ ml: 2 }}>
+          Manage Audio Files
+        </Typography>
+        <Box sx={{ ml: 'auto' }}>
+          <Tooltip title="Info">
+            <IconButton onClick={() => setHelpOpen(true)}>
+              <InfoOutlined />
             </IconButton>
           </Tooltip>
-          <Typography variant="h6" sx={{ ml: 2 }}>
-            Manage Audio Files
-          </Typography>
-          <Box sx={{ ml: 'auto' }}>
-            <Tooltip title="Info">
-              <IconButton onClick={() => setHelpOpen(true)}>
-                <InfoOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Toolbar>
-      </AppBar>
+        </Box>
+      </Toolbar>
       <Container sx={{ padding: 2 }}>
-        {/* {selectedFile && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="body1">Selected File:</Typography>
-            <Typography variant="body2">{selectedFile}</Typography>
-          </Box>
-        )} */}
         <List>
-          {music_files.map((file_name, index) => (
+          {musicFiles.map((file_name, index) => (
             <Box key={index}>
               <ListItem>
                 <ListItemIcon>
-                  <MusicNoteOutlinedIcon sx={{ fontSize: '1.5rem' }} />
+                  <MusicNoteOutlined sx={{ fontSize: '1.5rem' }} />
                 </ListItemIcon>
                 <ListItemText sx={{ fontSize: '1.5rem' }}>
                   <Typography variant="h5"> {file_name}</Typography>
                 </ListItemText>
                 {/* <ListItemIcon>
-                <IconButton>
-                <DeleteOutlinedIcon />
-                </IconButton>
+                  <IconButton
+                    onClick={() => {
+                      setSelectedFile(file_name)
+                      setNameDialogOpen(true)
+                    }}
+                  >
+                    <EditOutlined />
+                  </IconButton>
                 </ListItemIcon> */}
+                <ListItemIcon>
+                  <IconButton
+                    color="error"
+                    onClick={() => {
+                      setSelectedFile(file_name)
+                      setConfirmationOpen(true)
+                    }}
+                  >
+                    <DeleteOutlined />
+                  </IconButton>
+                </ListItemIcon>
               </ListItem>
               <Divider />
             </Box>
@@ -110,7 +121,7 @@ function ManageAudioFiles(): JSX.Element {
           onClick={handleSelectFile}
           sx={{ position: 'absolute', right: '3rem', bottom: '3rem' }}
         >
-          <UploadFileOutlinedIcon sx={{ mr: 1 }} />
+          <UploadFileOutlined sx={{ mr: 1 }} />
           Upload File
         </Fab>
       </Container>
@@ -127,6 +138,29 @@ function ManageAudioFiles(): JSX.Element {
           <Button onClick={() => setHelpOpen(false)}>Ok</Button>
         </DialogActions>
       </Dialog>
+      <ConfirmationDialog
+        open={confirmationOpen}
+        title="Delete file?"
+        message={`Are you sure you want to delete this ${selectedFile} file. This action cannot be undone.`}
+        onClose={() => setConfirmationOpen(false)}
+        onConfirm={async () => {
+          if (!selectedFile) return
+          await deleteAudioFile(selectedFile)
+          setMusicFiles((prev) => prev.filter((file) => file !== selectedFile))
+          setConfirmationOpen(false)
+        }}
+      />
+      <NameDialog
+        open={nameDialogOpen}
+        title="Rename this file"
+        label="Rename"
+        text={selectedFile || ''}
+        onClose={() => setNameDialogOpen(false)}
+        onSubmit={async (newFileName) => {
+          if (selectedFile) await renameAudioFile(selectedFile, newFileName)
+          setNameDialogOpen(false)
+        }}
+      />
     </>
   )
 }
