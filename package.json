@@ -30,6 +30,7 @@
     "fastpriorityqueue": "^0.7.5",
     "node-web-audio-api": "^0.21.1",
     "pouchdb": "^9.0.0",
+    "pouchdb-find": "^9.0.0",
     "react-router-dom": "^6.25.1",
     "sonner": "^1.5.0",
     "uuid": "^11.1.0"

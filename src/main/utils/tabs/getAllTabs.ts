@@ -10,8 +10,13 @@ export const getAllTabs = async (): Promise<Tab[]> => {
     const tabs: Tab[] = result.rows.map((row) => {
       const tab = row.doc as unknown as Tab
 
-      // sort the data
-      tab.data = sortTimeData(tab.data)
+      // Ensure tab.data is an array before sorting
+      if (Array.isArray(tab.data)) {
+        tab.data = sortTimeData(tab.data)
+      } else {
+        console.warn(`Data for tab ${tab.tab_name} is not an array or is undefined:`, tab.data)
+        tab.data = [] // Assign an empty array if undefined or invalid
+      }
 
       return tab
     })

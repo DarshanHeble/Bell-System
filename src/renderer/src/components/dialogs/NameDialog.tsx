@@ -32,6 +32,7 @@ const NameDialog: FC<NameDialogProps> = ({ open, title, text, label, onClose, on
       }, 200)
       return (): void => clearTimeout(timer)
     }
+    return undefined
   }, [open, text])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
@@ -65,7 +66,6 @@ const NameDialog: FC<NameDialogProps> = ({ open, title, text, label, onClose, on
             name={label}
             label={label}
             onChange={handleNameChange}
-            
             sx={{ marginBlockStart: 2 }}
             fullWidth
             autoFocus

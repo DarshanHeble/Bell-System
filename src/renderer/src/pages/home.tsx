@@ -21,12 +21,12 @@ import {
   NotificationsOffRounded
 } from '@mui/icons-material'
 import { Tab, TimeData } from '@shared/type'
-import NewTabDialog from '../dialogs/NewTabDialog'
-import AlarmDialog from '../dialogs/AlarmDialog'
+import NewTabDialog from '../components/dialogs/NewTabDialog'
+import AlarmDialog from '../components/dialogs/AlarmDialog'
 import { checkTimeMatch } from '@renderer/utils'
 import { useNavigate } from 'react-router-dom'
-import AlarmCard from '../smallComponents/AlarmCard'
-import HoverableSidebarBox from '../smallComponents/HoverableSidebarBox'
+import AlarmCard from '../components/smallComponents/AlarmCard'
+import HoverableSidebarBox from '../components/smallComponents/HoverableSidebarBox'
 import { sortTimeData } from '@shared/utils'
 import { v4 } from 'uuid'
 
@@ -38,7 +38,7 @@ function Home(): JSX.Element {
   const handleClose = (): void => setOpen(false)
   // AlarmDialog
 
-  // const [, SetData] = useState<Tab[]>(timedata)
+  // const [, SetData] = useState<Tab[]>(timeData)
   const [tabs, setTabs] = useState<Tab[]>([])
   const [activeTab, setActiveTab] = useState<string>('')
   // const [previousActiveTab, setPreviousActiveTab] = useState<string>('')

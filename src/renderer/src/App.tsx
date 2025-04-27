@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react'
 import { Box, CircularProgress } from '@mui/material'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import ManageAudioFiles from './components/pages/ManageAudioFiles'
-import Lock from './components/pages/lock'
-import Home from './components/pages/home'
+import ManageAudioFiles from './pages/ManageAudioFiles'
+import Lock from './pages/lock'
+import BellTab from './pages/BellTab'
+import Sidebar from './components/Sidebar'
+import NewHome from './pages/NewHome'
+import { TabWithOutTimeData } from '@shared/type'
+import { fetchTabs } from './api'
+// import Home from './pages/home'
 
 function App(): JSX.Element {
   const [isVerified, setIsVerified] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  const [tabs, setTabs] = useState<TabWithOutTimeData[]>([])
 
   useEffect(() => {
     const loadingSetTimeOut = setTimeout(() => {
@@ -25,6 +32,32 @@ function App(): JSX.Element {
     // clear timeout when the component unmounts
     return (): void => clearTimeout(loadingSetTimeOut)
   }, [])
+
+  // API for fetching data from DB
+  useEffect(() => {
+    const fetchData = async (): Promise<void> => {
+      try {
+        const fetchedTabs: TabWithOutTimeData[] = await fetchTabs()
+        // console.log('fetchedTabs', fetchedTabs)
+        setTabs(fetchedTabs)
+
+        // if (fetchedTabs.length > 0) {
+        //   setActiveTab(fetchedTabs[0]._id)
+        //   // console.log('set active', activeTab)
+        // }
+      } catch (error) {
+        console.error('Error fetching tabs:', error)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Find the initially active tab to redirect to it
+  const initialActiveTab = tabs.find((tab) => tab.isActive)
+  const initialRoute = initialActiveTab ? `/tabs/${initialActiveTab._id}` : '/'
+
+  // console.log(initialActiveTab)
 
   if (isLoading) {
     return (
@@ -44,19 +77,25 @@ function App(): JSX.Element {
 
   return (
     <HashRouter>
-      <Routes>
-        {/* If the user is verified, redirect to the home page */}
-        {isVerified ? (
-          <>
-            <Route path="/" Component={Home} />
-            <Route path="/manageAudioFiles" Component={ManageAudioFiles} />
-          </>
-        ) : (
-          <>
-            <Route path="/" element={<Lock setVerified={setIsVerified} />} />
-          </>
-        )}
-      </Routes>
+      <div style={{ display: 'flex', height: '-webkit-fill-available' }}>
+        <Sidebar />
+        <Routes>
+          {isVerified ? (
+            <>
+              <Route path="/" element={<NewHome />} />
+              <Route path="/tabs/:tabId" Component={BellTab} />
+              <Route path="/manageAudioFiles" Component={ManageAudioFiles} />
+              {initialActiveTab && (
+                <Route path="/" element={<Navigate to={initialRoute} replace />} />
+              )}
+            </>
+          ) : (
+            <>
+              <Route path="/" element={<Lock setVerified={setIsVerified} />} />
+            </>
+          )}
+        </Routes>
+      </div>
     </HashRouter>
   )
 }

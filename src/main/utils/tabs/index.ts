@@ -1,0 +1,6 @@
+export { default as addTab } from './addTab'
+export { default as deleteTab } from './deleteTab'
+export { default as getAllTabs } from './getAllTabs'
+export { default as renameTab } from './renameTab'
+export { default as setActiveTab } from './setActiveTab'
+export { default as getAllTabsWithoutTimeData } from './getAllTabsWithoutTimeData'

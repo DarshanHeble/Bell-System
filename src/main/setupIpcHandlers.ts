@@ -3,14 +3,17 @@ import { Tab, TimeData } from '@shared/type'
 import { deleteAudioFile, getMusicFiles, renameAudioFile, selectAudioFile } from './utils/audios'
 import {
   addTab,
+  deleteTab,
+  getAllTabs,
+  getAllTabsWithoutTimeData,
+  renameTab,
+  setActiveTab
+} from './utils/tabs'
+import {
   addTimeDataToTab,
   checkUserVerified,
-  deleteTab,
   deleteTimeData,
-  getAllTabs,
   playAudio,
-  renameTab,
-  setActiveTab,
   updateSwitch,
   userVerified
 } from './utils'
@@ -26,6 +29,7 @@ const setupIpcHandlers = async (): Promise<void> => {
   ipcMain.handle('setActiveTab', (_, activeTabId: string, inActiveTabId: string) => {
     setActiveTab(activeTabId, inActiveTabId)
   })
+  ipcMain.handle('getAllTabWithOutTimeData', () => getAllTabsWithoutTimeData())
 
   // Time data management
   ipcMain.handle('addTimeData', (_, _id: string, data: TimeData) => addTimeDataToTab(_id, data))

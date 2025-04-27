@@ -33,6 +33,7 @@ export type activeTabType = {
 }
 
 export type TabWithOut_Id = Omit<Tab, '_id'>
+export type TabWithOutTimeData = Omit<Tab, 'data'>
 
 export type TabWithRev = Tab & { _rev: string }
 

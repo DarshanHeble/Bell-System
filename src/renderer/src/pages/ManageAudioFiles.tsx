@@ -28,9 +28,9 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Toaster } from 'sonner'
-import ConfirmationDialog from '../dialogs/ConfirmationDialog'
+import ConfirmationDialog from '../components/dialogs/ConfirmationDialog'
 import { deleteAudioFile, renameAudioFile } from '@renderer/api'
-import NameDialog from '../dialogs/NameDialog'
+import NameDialog from '../components/dialogs/NameDialog'
 
 function ManageAudioFiles(): JSX.Element {
   const navigate = useNavigate()

@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Box, Button, Divider, IconButton, Menu, MenuItem } from '@mui/material'
 import { Alarm, MoreVert, EditOutlined, DeleteOutlined } from '@mui/icons-material'
-import { Tab } from '@shared/type'
+import { TabWithOutTimeData } from '@shared/type'
 import RenameTabDialog from '../dialogs/RenameTabDialog'
+import { updateActiveTab } from '@renderer/api'
 
 interface HoverableSidebarBoxProps {
-  data: Tab
+  data: TabWithOutTimeData
   activeTab: string
   setActiveTab: (id: string) => void
   onTabDelete: (_id: string) => void
@@ -47,6 +48,11 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
     onTabRename(_id, newTabName)
   }
 
+  const handleActiveTab = (): void => {
+    updateActiveTab(activeTab, data._id)
+    setActiveTab(data._id)
+  }
+
   return (
     <Box
       sx={{
@@ -59,7 +65,7 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
       <Button
         variant="contained"
         startIcon={<Alarm />}
-        onClick={() => setActiveTab(data._id)}
+        onClick={handleActiveTab}
         sx={{
           borderRadius: 5,
           textTransform: 'none',
