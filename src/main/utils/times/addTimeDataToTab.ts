@@ -31,6 +31,7 @@ export const addTimeDataToTab = async (_id: string, timeData: TimeData): Promise
     }
   } catch (error) {
     console.error('Error adding TimeData to tab:', error)
+    throw error
   }
 }
 

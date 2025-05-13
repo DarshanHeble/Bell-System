@@ -6,6 +6,7 @@ import {
   deleteTab,
   getAllTabs,
   getAllTabsWithoutTimeData,
+  getTab,
   renameTab,
   setActiveTab
 } from './utils/tabs'
@@ -21,6 +22,7 @@ import {
 const setupIpcHandlers = async (): Promise<void> => {
   // Tab management
   ipcMain.handle('getTabs', () => getAllTabs())
+  ipcMain.handle('getTab', (_, tabId: string) => getTab(tabId))
   ipcMain.handle('addTab', (_, tabData: Tab) => addTab(tabData))
   ipcMain.handle('deleteTab', (_, _id: string) => deleteTab(_id))
   ipcMain.handle('renameTab', (_, _id: string, newTabName: string) => {

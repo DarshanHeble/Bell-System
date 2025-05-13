@@ -73,7 +73,7 @@ const Sidebar = (): JSX.Element => {
     <>
       <Box
         sx={{
-          width: '15rem',
+          minWidth: '15rem',
           height: '-webkit-fill-available',
           display: 'flex',
           flexDirection: 'column',

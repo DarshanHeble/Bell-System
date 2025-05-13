@@ -59,7 +59,7 @@ function ManageAudioFiles(): JSX.Element {
   }
 
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <Toaster richColors />
       <Toolbar sx={{ backgroundColor: '#202020' }}>
         <Tooltip title="Go back">
@@ -161,7 +161,7 @@ function ManageAudioFiles(): JSX.Element {
           setNameDialogOpen(false)
         }}
       />
-    </>
+    </div>
   )
 }
 

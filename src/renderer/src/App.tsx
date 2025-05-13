@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Box, CircularProgress } from '@mui/material'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
@@ -6,58 +6,36 @@ import ManageAudioFiles from './pages/ManageAudioFiles'
 import Lock from './pages/lock'
 import BellTab from './pages/BellTab'
 import Sidebar from './components/Sidebar'
-import NewHome from './pages/NewHome'
-import { TabWithOutTimeData } from '@shared/type'
-import { fetchTabs } from './api'
-// import Home from './pages/home'
+import { checkUserIsVerified, fetchTabs } from './api'
+import { useQuery } from '@tanstack/react-query'
 
 function App(): JSX.Element {
   const [isVerified, setIsVerified] = useState<boolean>(false)
-  const [isLoading, setIsLoading] = useState<boolean>(true)
 
-  const [tabs, setTabs] = useState<TabWithOutTimeData[]>([])
-
-  useEffect(() => {
-    const loadingSetTimeOut = setTimeout(() => {
-      setIsLoading(false)
-    }, 500)
-
-    // Check if the user has already verified (from Electron Store)
-    const checkUserVerified = async (): Promise<void> => {
-      const response: boolean = await window.electron.ipcRenderer.invoke('checkUserIsVerified')
-      setIsVerified(response)
+  const { data: initData, isLoading } = useQuery({
+    queryKey: ['init'],
+    queryFn: async () => {
+      const [isUserVerified, fetchedTabs] = await Promise.all([checkUserIsVerified(), fetchTabs()])
+      return { isUserVerified, fetchedTabs }
     }
-    checkUserVerified()
+  })
 
-    // clear timeout when the component unmounts
-    return (): void => clearTimeout(loadingSetTimeOut)
-  }, [])
-
-  // API for fetching data from DB
+  // Update state when data changes
   useEffect(() => {
-    const fetchData = async (): Promise<void> => {
-      try {
-        const fetchedTabs: TabWithOutTimeData[] = await fetchTabs()
-        // console.log('fetchedTabs', fetchedTabs)
-        setTabs(fetchedTabs)
-
-        // if (fetchedTabs.length > 0) {
-        //   setActiveTab(fetchedTabs[0]._id)
-        //   // console.log('set active', activeTab)
-        // }
-      } catch (error) {
-        console.error('Error fetching tabs:', error)
-      }
+    if (initData?.isUserVerified) {
+      setIsVerified(initData.isUserVerified)
     }
+  }, [initData])
 
-    fetchData()
-  }, [])
-
-  // Find the initially active tab to redirect to it
-  const initialActiveTab = tabs.find((tab) => tab.isActive)
-  const initialRoute = initialActiveTab ? `/tabs/${initialActiveTab._id}` : '/'
-
-  // console.log(initialActiveTab)
+  // Memoize the active tab calculation
+  const { defaultRoute } = useMemo(() => {
+    const tabs = initData?.fetchedTabs || []
+    const activeTab = tabs.find((tab) => tab.isActive === true)
+    const firstTab = tabs[0]
+    return {
+      defaultRoute: activeTab ? `/tabs/${activeTab._id}` : firstTab ? `/tabs/${firstTab._id}` : '/'
+    }
+  }, [initData])
 
   if (isLoading) {
     return (
@@ -82,12 +60,9 @@ function App(): JSX.Element {
         <Routes>
           {isVerified ? (
             <>
-              <Route path="/" element={<NewHome />} />
+              <Route path="/" element={<Navigate to={defaultRoute} replace />} />
               <Route path="/tabs/:tabId" Component={BellTab} />
               <Route path="/manageAudioFiles" Component={ManageAudioFiles} />
-              {initialActiveTab && (
-                <Route path="/" element={<Navigate to={initialRoute} replace />} />
-              )}
             </>
           ) : (
             <>

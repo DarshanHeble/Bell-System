@@ -27,6 +27,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
+    "@tanstack/react-query": "^5.74.4",
     "fastpriorityqueue": "^0.7.5",
     "node-web-audio-api": "^0.21.1",
     "pouchdb": "^9.0.0",

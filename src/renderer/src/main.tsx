@@ -4,6 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const darkTheme = createTheme({
   palette: {
@@ -27,11 +28,15 @@ const darkTheme = createTheme({
   }
 })
 
+const queryClient = new QueryClient()
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <App />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 )

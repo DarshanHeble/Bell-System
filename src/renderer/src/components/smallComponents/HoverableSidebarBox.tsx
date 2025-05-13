@@ -4,6 +4,7 @@ import { Alarm, MoreVert, EditOutlined, DeleteOutlined } from '@mui/icons-materi
 import { TabWithOutTimeData } from '@shared/type'
 import RenameTabDialog from '../dialogs/RenameTabDialog'
 import { updateActiveTab } from '@renderer/api'
+import { useNavigate } from 'react-router-dom'
 
 interface HoverableSidebarBoxProps {
   data: TabWithOutTimeData
@@ -20,6 +21,8 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
   onTabDelete,
   onTabRename
 }) => {
+  const navigate = useNavigate()
+
   const [isHovered, setIsHovered] = useState(false)
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [openSidebaranchorEl, setOpenSidebaranchorEl] = useState<null | HTMLElement>(null)
@@ -49,8 +52,9 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
   }
 
   const handleActiveTab = (): void => {
-    updateActiveTab(activeTab, data._id)
+    updateActiveTab(data._id, activeTab)
     setActiveTab(data._id)
+    navigate(`/tabs/${data._id}`)
   }
 
   return (
