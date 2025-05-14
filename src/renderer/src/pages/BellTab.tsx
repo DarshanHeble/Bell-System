@@ -3,10 +3,11 @@ import { Box, Fab, Grid, LinearProgress, Menu, MenuItem } from '@mui/material'
 import NoBells from '@renderer/components/smallComponents/NoBells'
 import AlarmCard from '@renderer/components/smallComponents/AlarmCard'
 import { TimeData } from '@shared/type'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Add, DeleteOutlined } from '@mui/icons-material'
 import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
-import { useAddBell, useBells } from '@renderer/hooks/bells'
+import { useAddBell, useBells, useDeleteBell } from '@renderer/hooks/bells'
+import { addToQueue, bellQueue, processNextBell } from '@shared/bellQueue'
 
 const BellTab = (): JSX.Element => {
   const { tabId } = useParams<{ tabId: string }>()
@@ -36,38 +37,56 @@ const BellTab = (): JSX.Element => {
 
   const { data: bells, isLoading: isBellsLoading, isFetching: isBellsFetching } = useBells(tabId)
   const { mutate: addBell } = useAddBell(tabId)
+  const { mutate: deleteBell } = useDeleteBell(tabId)
 
-  function handleTimeAdd(tabId: string, newTimeData: TimeData): void {
+  if (!isBellsLoading) {
+    console.log('Bells:', bells)
+  }
+
+  useEffect(() => {
+    const initializeQueue = async (): Promise<void> => {
+      if (bells) {
+        // Populate the queue with fetched data
+        await addToQueue(bells.data)
+        await processNextBell() // Ensure queue processing is completed before moving on
+      }
+    }
+
+    initializeQueue()
+  }, [bells])
+
+  async function handleTimeAdd(tabId: string, newTimeData: TimeData): Promise<void> {
     if (!tabId) return
     addBell(newTimeData)
+    bellQueue.add(newTimeData)
+    await processNextBell()
+  }
+
+  async function handleTimeDelete(): Promise<void> {
+    if (cardContextMenu) {
+      deleteBell(cardContextMenu.data)
+      setCardContextMenu(null)
+      bellQueue.remove(cardContextMenu.data)
+      await processNextBell()
+    }
   }
 
   if (bells === undefined) {
     return <>No ID found</>
   }
 
-  if (bells.data.length === 0) {
-    return (
-      <>
-        <NoBells />
-        <Fab
-          variant="extended"
-          sx={{ position: 'fixed', bottom: '3rem', right: '3rem', textTransform: 'none' }}
-          onClick={handleOpen}
-        >
-          <Add sx={{ mr: 1 }} /> New Alarm
-        </Fab>
-      </>
-    )
-  }
-
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%', display: 'flex' }}>
       {isBellsLoading || (isBellsFetching && <LinearProgress />)}
-      <Box sx={{ p: 3 }}>
+
+      <Box sx={{ p: 3, flex: 1 }}>
+        {/* Handle when no bell */}
+        {bells.data.length === 0 && <NoBells />}
+
+        {/* Handle when bell */}
         <Grid spacing={2} container>
-          {bells.data.map((bell) => (
-            <Grid key={bell.id} size={4}>
+          {bells.data.map((bell, index) => (
+            <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
               <AlarmCard data={bell} tab_id={bells._id} onContextMenu={handleContextMenu} />
             </Grid>
           ))}
@@ -97,7 +116,7 @@ const BellTab = (): JSX.Element => {
               : undefined
           }
         >
-          <MenuItem>
+          <MenuItem onClick={handleTimeDelete}>
             <DeleteOutlined sx={{ mr: 1 }} /> Delete
           </MenuItem>
         </Menu>

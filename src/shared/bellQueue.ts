@@ -1,5 +1,5 @@
 import FastPriorityQueue from 'fastpriorityqueue'
-import { Tab, Time, TimeData } from './type'
+import { Time, TimeData } from './type'
 
 export const bellQueue = new FastPriorityQueue<TimeData>((a, b) => {
   const convertTo24Hour = (time: Time): number =>
@@ -8,19 +8,17 @@ export const bellQueue = new FastPriorityQueue<TimeData>((a, b) => {
   return convertTo24Hour(a.time) < convertTo24Hour(b.time)
 })
 
+// Function to add data to the queue
+export async function addToQueue(data: TimeData[]): Promise<void> {
+  data.forEach((item) => bellQueue.add(item))
+}
+
 // Utility to get the current time in 24-hour format for comparison
 function getCurrent24HourTime(): number {
   const now = new Date()
   const hour = now.getHours() // 0-23
   const minute = now.getMinutes()
   return hour + minute / 60
-}
-
-// Add multiple bell data to the queue
-export async function addBellData(tab: Tab): Promise<void> {
-  tab.data.forEach((element) => {
-    bellQueue.add(element)
-  })
 }
 
 // Get and handle the earliest time data
@@ -43,7 +41,9 @@ export async function processNextBell(): Promise<void> {
     if (nextTime24Hour <= getCurrent24HourTime()) {
       // Time has passed; discard this item
       bellQueue.poll()
-      console.log(`Skipped: ${nextBell.label} (time already passed)`)
+      console.log(
+        `Skipped: ${nextBell.time.hour}:${nextBell.time.minute} ${nextBell.time.period} (time already passed)`
+      )
     } else {
       // Time is valid; process this item
       console.log(`Processing: ${nextBell.label}`)
@@ -64,30 +64,3 @@ export async function processNextBell(): Promise<void> {
     }
   }
 }
-
-// Example Usage
-// ;(async () => {
-//   const tab: Tab = {
-//     data: [
-//       {
-//         id: '1',
-//         time: { hour: 8, minute: 30, period: 'am' },
-//         label: 'Morning Alarm',
-//         music_file_name: 'alarm1.mp3',
-//         days: [{ day: 'Monday', active: true }],
-//         switch_state: true
-//       },
-//       {
-//         id: '2',
-//         time: { hour: 9, minute: 0, period: 'am' },
-//         label: 'Meeting Reminder',
-//         music_file_name: 'reminder.mp3',
-//         days: [{ day: 'Tuesday', active: true }],
-//         switch_state: true
-//       }
-//     ]
-//   }
-
-//   await addBellData(tab)
-//   await processNextBell() // Start processing the queue
-// })()

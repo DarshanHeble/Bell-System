@@ -29,7 +29,7 @@ const Sidebar = (): JSX.Element => {
     const fetchData = async (): Promise<void> => {
       try {
         const fetchedTabs: TabWithOutTimeData[] = await fetchTabs()
-        console.log('fetchedTabs', fetchedTabs)
+        // console.log('fetchedTabs', fetchedTabs)
         setTabs(fetchedTabs)
 
         if (fetchedTabs.length > 0) {

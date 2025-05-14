@@ -1,4 +1,4 @@
-import { addTime, getTab } from '@renderer/api'
+import { addTime, deleteTime, getTab } from '@renderer/api'
 import { Tab, TimeData } from '@shared/type'
 import {
   useMutation,
@@ -34,19 +34,21 @@ export const useAddBell = (tabId: string): UseMutationResult<boolean, Error, Tim
   })
 }
 
-// export const useDeleteBell = (tabId?: string) => {
-//   const queryClient = useQueryClient()
+export const useDeleteBell = (
+  tabId?: string
+): UseMutationResult<boolean, Error, TimeData, unknown> => {
+  const queryClient = useQueryClient()
 
-//   return useMutation({
-//     mutationFn: async (bellId: string) => {
-//       if (!tabId) throw new Error('Tab ID is required')
-//       return await deleteBell(tabId, bellId)
-//     },
-//     onSuccess: () => {
-//       queryClient.invalidateQueries(['bellTab', tabId])
-//     }
-//   })
-// }
+  return useMutation({
+    mutationFn: async (timeData: TimeData) => {
+      if (!tabId) throw new Error('Tab ID is required')
+      return await deleteTime(tabId, timeData)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bellTab', tabId] })
+    }
+  })
+}
 
 // export const useUpdateBell = (tabId?: string) => {
 //   const queryClient = useQueryClient()

@@ -75,6 +75,8 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
           textTransform: 'none',
           justifyContent: 'start',
           bgcolor: data._id === activeTab ? '' : 'white',
+          // bgcolor: data._id === activeTab ? '' : '#333333',
+          // color: data._id === activeTab ? '' : '#dcdcdcdc',
           zIndex: 3,
           width: '100%'
         }}
