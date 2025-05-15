@@ -33,7 +33,16 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
         height: 'max-content'
       }}
     >
-      <CardActionArea onContextMenu={handleContextMenu} onClick={handleContextMenu}>
+      <CardActionArea
+        onContextMenu={handleContextMenu}
+        onClick={handleContextMenu}
+        sx={{
+          '& .MuiTouchRipple-child': {
+            backgroundColor: '#707070'
+            // backgroundColor: '#656565'
+          }
+        }}
+      >
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'start', alignItems: 'baseline' }}>
             <Typography variant="h3" component="h2" sx={{ fontSize: '3.5rem' }}>

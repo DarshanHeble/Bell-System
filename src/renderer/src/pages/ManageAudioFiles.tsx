@@ -18,14 +18,12 @@ import {
   Typography
 } from '@mui/material'
 import {
-  ArrowBackOutlined,
   DeleteOutlined,
   InfoOutlined,
   MusicNoteOutlined,
   UploadFileOutlined
 } from '@mui/icons-material'
 
-import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Toaster } from 'sonner'
 import ConfirmationDialog from '../components/dialogs/ConfirmationDialog'
@@ -33,8 +31,6 @@ import { deleteAudioFile, renameAudioFile } from '@renderer/api'
 import NameDialog from '../components/dialogs/NameDialog'
 
 function ManageAudioFiles(): JSX.Element {
-  const navigate = useNavigate()
-
   const [helpOpen, setHelpOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
@@ -62,11 +58,11 @@ function ManageAudioFiles(): JSX.Element {
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <Toaster richColors />
       <Toolbar sx={{ backgroundColor: '#202020' }}>
-        <Tooltip title="Go back">
+        {/* <Tooltip title="Go back">
           <IconButton size="large" onClick={() => navigate('/')}>
             <ArrowBackOutlined />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
         <Typography variant="h6" sx={{ ml: 2 }}>
           Manage Audio Files
         </Typography>

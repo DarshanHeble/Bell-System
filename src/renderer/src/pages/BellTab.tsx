@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { Add, DeleteOutlined } from '@mui/icons-material'
 import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
 import { useAddBell, useBells, useDeleteBell } from '@renderer/hooks/bells'
-import { addToQueue, bellQueue, processNextBell } from '@shared/bellQueue'
+import { addToQueue, bellQueue, processNextBell } from '@renderer/bellQueue'
 
 const BellTab = (): JSX.Element => {
   const { tabId } = useParams<{ tabId: string }>()
@@ -31,9 +31,7 @@ const BellTab = (): JSX.Element => {
     })
   }
 
-  if (!tabId) {
-    return <>No ID found</>
-  }
+  if (!tabId) return <>No ID found</>
 
   const { data: bells, isLoading: isBellsLoading, isFetching: isBellsFetching } = useBells(tabId)
   const { mutate: addBell } = useAddBell(tabId)
@@ -71,12 +69,10 @@ const BellTab = (): JSX.Element => {
     }
   }
 
-  if (bells === undefined) {
-    return <>No ID found</>
-  }
+  if (bells === undefined) return <>No ID found</>
 
   return (
-    <div style={{ width: '100%', display: 'flex' }}>
+    <div style={{ width: '100%', display: 'flex', overflowY: 'auto' }}>
       {isBellsLoading || (isBellsFetching && <LinearProgress />)}
 
       <Box sx={{ p: 3, flex: 1 }}>
@@ -86,7 +82,7 @@ const BellTab = (): JSX.Element => {
         {/* Handle when bell */}
         <Grid spacing={2} container>
           {bells.data.map((bell, index) => (
-            <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid key={index} size={{ sm: 12, md: 6, lg: 4 }}>
               <AlarmCard data={bell} tab_id={bells._id} onContextMenu={handleContextMenu} />
             </Grid>
           ))}

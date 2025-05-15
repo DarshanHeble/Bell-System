@@ -1,5 +1,6 @@
+import { Time, TimeData } from '@shared/type'
 import FastPriorityQueue from 'fastpriorityqueue'
-import { Time, TimeData } from './type'
+import { playAudio } from './utils/playAudio'
 
 export const bellQueue = new FastPriorityQueue<TimeData>((a, b) => {
   const convertTo24Hour = (time: Time): number =>
@@ -55,6 +56,7 @@ export async function processNextBell(): Promise<void> {
           console.log(
             `Executing: ${nextBell.label} at ${nextBell.time.hour}:${nextBell.time.minute} ${nextBell.time.period}`
           )
+          playAudio(nextBell.music_file_name)
           await processNextBell() // Process the next item
         },
         (nextTime24Hour - getCurrent24HourTime()) * 60 * 60 * 1000

@@ -46,3 +46,7 @@ export const addTime = async (_id: string, newTimeData: TimeData): Promise<boole
 export const deleteTime = async (_id: string, newTimeData: TimeData): Promise<boolean> => {
   return await window.electron.ipcRenderer.invoke('deleteTimeData', _id, newTimeData)
 }
+
+export const getMusicFiles = async (): Promise<string[]> => {
+  return await window.electron.ipcRenderer.invoke('get-music-files')
+}

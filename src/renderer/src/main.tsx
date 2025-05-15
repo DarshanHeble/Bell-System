@@ -24,6 +24,15 @@ const darkTheme = createTheme({
           backgroundImage: 'none'
         }
       }
+    },
+    MuiCardActionArea: {
+      styleOverrides: {
+        root: {
+          '& .MuiTouchRipple-child': {
+            backgroundColor: '#707070'
+          }
+        }
+      }
     }
   }
 })
