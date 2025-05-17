@@ -1,6 +1,12 @@
 import { ipcMain } from 'electron'
 import { Tab, TimeData } from '@shared/type'
-import { deleteAudioFile, getMusicFiles, renameAudioFile, selectAudioFile } from './utils/audios'
+import {
+  createAudioFile,
+  deleteAudioFile,
+  getMusicFiles,
+  renameAudioFile,
+  selectAudioFile
+} from './utils/audios'
 import {
   addTab,
   deleteTab,
@@ -48,6 +54,7 @@ const setupIpcHandlers = async (): Promise<void> => {
     }
   )
   ipcMain.handle('select-music-file', async () => await selectAudioFile())
+  ipcMain.handle('createAudioFile', async () => await createAudioFile())
   ipcMain.handle('get-music-files', async () => await getMusicFiles())
   ipcMain.handle('deleteAudioFile', async (_, fileName: string) => await deleteAudioFile(fileName))
   ipcMain.handle(

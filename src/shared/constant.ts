@@ -18,8 +18,13 @@ export const pdbBellFilePath = path.join(projectDirPath, pBellDbName)
 // path to the other data of the project
 export const pdbOtherFilePath = path.join(projectDirPath, pOtherDbName)
 
+export const audioFilePath = path.join(projectDirPath, 'audio')
+
 // path to the user music directory
 export const userMusicDirPath = app.getPath('music')
 
 // path to the app music directory
 export const projectMusicDirPath = path.join(userMusicDirPath, appMusicDirName)
+
+export const AUDIO_EXTENSIONS_REGEX = /\.(mp3|wav|ogg)$/i
+export const CUSTOM_PROTOCOL_SCHEME = 'myaudio'

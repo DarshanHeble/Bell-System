@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { Add, DeleteOutlined } from '@mui/icons-material'
 import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
 import { useAddBell, useBells, useDeleteBell } from '@renderer/hooks/bells'
-import { addToQueue, bellQueue, processNextBell } from '@renderer/bellQueue'
+import { addToQueue, bellQueue, clearQueue, processNextBell } from '@renderer/bellQueue'
 
 const BellTab = (): JSX.Element => {
   const { tabId } = useParams<{ tabId: string }>()
@@ -37,14 +37,11 @@ const BellTab = (): JSX.Element => {
   const { mutate: addBell } = useAddBell(tabId)
   const { mutate: deleteBell } = useDeleteBell(tabId)
 
-  if (!isBellsLoading) {
-    console.log('Bells:', bells)
-  }
-
   useEffect(() => {
     const initializeQueue = async (): Promise<void> => {
       if (bells) {
         // Populate the queue with fetched data
+        await clearQueue()
         await addToQueue(bells.data)
         await processNextBell() // Ensure queue processing is completed before moving on
       }

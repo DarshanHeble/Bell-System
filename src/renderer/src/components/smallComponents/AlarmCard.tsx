@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Box, Card, CardActionArea, CardContent, Typography, Switch } from '@mui/material'
 import { TimeData } from '@shared/type'
+import { processNextBell } from '@renderer/bellQueue'
 
 interface AlarmCardProps {
   data: TimeData
@@ -16,14 +17,24 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
     onContextMenu(event, data)
   }
 
-  const handleSwitchOnChange = (): void => {
-    setIsChecked((prevValue) => {
-      const newValue = !prevValue
-      console.log(newValue)
+  const handleSwitchOnChange = async (): Promise<void> => {
+    const newValue = !isChecked // Toggle the value of the switch
+    setIsChecked(newValue) // Optimistically update the state
 
-      window.electron.ipcRenderer.invoke('updateSwitch', tab_id, data.id, newValue)
-      return newValue
-    })
+    try {
+      // console.log(`Switch state updated to: ${newValue}`)
+
+      // Update the backend with the new value
+      await window.electron.ipcRenderer.invoke('updateSwitch', tab_id, data.id, newValue)
+
+      // Reprocess the bell queue to account for the updated switch state
+      await processNextBell()
+    } catch (error) {
+      console.error('Error updating switch state:', error)
+
+      // Revert the state if the backend update fails
+      setIsChecked(!newValue)
+    }
   }
 
   return (
@@ -33,31 +44,37 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
         height: 'max-content'
       }}
     >
-      <CardActionArea
-        onContextMenu={handleContextMenu}
-        onClick={handleContextMenu}
-        sx={{
-          '& .MuiTouchRipple-child': {
-            backgroundColor: '#707070'
-            // backgroundColor: '#656565'
-          }
-        }}
-      >
+      <CardActionArea onContextMenu={handleContextMenu} onClick={handleContextMenu}>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'start', alignItems: 'baseline' }}>
-            <Typography variant="h3" component="h2" sx={{ fontSize: '3.5rem' }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{ fontSize: '3.5rem' }}
+              color={!isChecked ? 'textDisabled' : 'textPrimary'}
+            >
               {data.time.hour}:{data.time.minute.toString().padStart(2, '0')}
             </Typography>
-            <Typography variant="h5" sx={{ ml: 1 }}>
+            <Typography
+              variant="h5"
+              sx={{ ml: 1 }}
+              color={!isChecked ? 'textDisabled' : 'textPrimary'}
+            >
               {data.time.period}
             </Typography>
           </Box>
           <Box>
-            <Typography>{data.label}</Typography>
-            <Typography>{data.music_file_name}</Typography>
+            <Typography color={!isChecked ? 'textDisabled' : 'textPrimary'}>
+              {data.label}
+            </Typography>
+            <Typography color={!isChecked ? 'textDisabled' : 'textPrimary'}>
+              {data.music_file_name}
+            </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
               {data.days.map((day, index) => (
-                <Typography key={index}>{day.day}</Typography>
+                <Typography key={index} color={!isChecked ? 'textDisabled' : 'textSecondary'}>
+                  {day.day}
+                </Typography>
               ))}
             </Box>
           </Box>

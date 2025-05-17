@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -20,6 +20,7 @@ import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined'
 import { getCurrentTime } from '@renderer/utils'
 import { TimeData } from '@shared/type'
 import { v4 } from 'uuid'
+import { useAudio } from '@renderer/hooks/audio'
 
 interface AddAlarmDialogProps {
   open: boolean
@@ -40,21 +41,7 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
   onTimeAdd,
   activeTab
 }) => {
-  const [allMusic, setAllMusic] = useState<string[]>([])
-
-  useEffect(() => {
-    const getMusicFiles = async (): Promise<void> => {
-      const result: string[] = await window.electron.ipcRenderer.invoke('get-music-files')
-      setAllMusic(result)
-    }
-    getMusicFiles()
-  }, [])
-
-  useEffect(() => {
-    if (allMusic.length > 0) {
-      setSelectedSound(allMusic[0])
-    }
-  }, [allMusic])
+  const { data: allMusic } = useAudio()
 
   const { hour, minute, period } = getCurrentTime()
 
@@ -302,8 +289,15 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
           >
             <MusicNoteOutlinedIcon />
             <Autocomplete
-              options={allMusic}
-              value={selectedSound}
+              options={allMusic || []}
+              defaultValue={allMusic?.[0]}
+              getOptionLabel={(option) => option.name || ''}
+              value={allMusic?.find((audio) => audio.name == selectedSound)}
+              renderOption={(props, option) => (
+                <li {...props} key={option.name}>
+                  {option.name}
+                </li>
+              )}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -311,7 +305,7 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
                   sx={{ height: '3rem', fontSize: 'large' }}
                 />
               )}
-              onChange={(_, newValue) => setSelectedSound(newValue)}
+              onChange={(_, newValue) => setSelectedSound(newValue?.name || null)}
               sx={{ width: '100%' }}
             />
           </Box>

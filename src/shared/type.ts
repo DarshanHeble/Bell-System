@@ -42,3 +42,8 @@ export type OtherDataType = {
   _rev: string
   isVerified: boolean
 }
+
+export type AudioFile = {
+  name: string
+  path: string
+}

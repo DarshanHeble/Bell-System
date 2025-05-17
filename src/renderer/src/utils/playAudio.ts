@@ -1,20 +1,5 @@
 import { getMusicFiles } from '@renderer/api'
-
-/**
- * Fetches the full path of an audio file given its filename.
- *
- * @param fileName - The name of the audio file to search for.
- * @param filePaths - An array of absolute paths to audio files.
- * @returns The full path of the audio file, or `null` if not found.
- */
-const getFilePathByName = (fileName: string, filePaths: string[]): string | null => {
-  const filePath = filePaths.find((path) => path.endsWith(fileName))
-  if (!filePath) {
-    console.warn(`Audio file [${fileName}] not found in the provided paths.`)
-    return null
-  }
-  return filePath
-}
+import handBell from '@renderer/assets/Handbell.mp3'
 
 /**
  * Plays an audio file from the given local file path.
@@ -26,14 +11,19 @@ export const playAudio = async (fileName: string): Promise<void> => {
 
   try {
     const audioFilesPaths = await getMusicFiles()
-    const filePath = getFilePathByName(fileName, audioFilesPaths)
+    console.log('audioFilesPaths', audioFilesPaths)
+
+    const file = audioFilesPaths.filter((file) => file.name === fileName)
+    const filePath = file[0].path
 
     let audio: HTMLAudioElement
 
     if (filePath) {
       audio = new Audio(filePath)
+      console.log('Initialized User audio file')
     } else {
-      audio = new Audio('/src/renderer/src/assets/Handbell.mp3')
+      audio = new Audio(handBell)
+      console.log('Initialized default audio file')
     }
 
     audio

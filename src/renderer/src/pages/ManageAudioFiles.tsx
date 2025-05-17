@@ -29,25 +29,28 @@ import { Toaster } from 'sonner'
 import ConfirmationDialog from '../components/dialogs/ConfirmationDialog'
 import { deleteAudioFile, renameAudioFile } from '@renderer/api'
 import NameDialog from '../components/dialogs/NameDialog'
+import { AudioFile } from '@shared/type'
+// import handBell from '@renderer/assets/Handbell.mp3'
 
 function ManageAudioFiles(): JSX.Element {
   const [helpOpen, setHelpOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
-  const [musicFiles, setMusicFiles] = useState<string[]>([])
-  const [selectedFile, setSelectedFile] = useState<string | null>(null)
+  const [musicFiles, setMusicFiles] = useState<AudioFile[]>([])
+  const [selectedFile, setSelectedFile] = useState<AudioFile | null>(null)
 
   useEffect(() => {
     const getMusicFiles = async (): Promise<void> => {
-      const result: string[] = await window.electron.ipcRenderer.invoke('get-music-files')
+      const result: AudioFile[] = await window.electron.ipcRenderer.invoke('get-music-files')
       setMusicFiles(result)
+      console.log(result)
     }
     getMusicFiles()
   }, [])
 
   const handleSelectFile = async (): Promise<void> => {
-    const fileName = await window.electron.ipcRenderer.invoke('select-music-file')
+    const fileName = await window.electron.ipcRenderer.invoke('createAudioFile')
     // if (filePath == null) {
     //   toast.error('something went wrong')
     // }
@@ -76,15 +79,21 @@ function ManageAudioFiles(): JSX.Element {
       </Toolbar>
       <Container sx={{ padding: 2 }}>
         <List>
-          {musicFiles.map((file_name, index) => (
+          {musicFiles.map((file, index) => (
             <Box key={index}>
               <ListItem>
                 <ListItemIcon>
                   <MusicNoteOutlined sx={{ fontSize: '1.5rem' }} />
                 </ListItemIcon>
                 <ListItemText sx={{ fontSize: '1.5rem' }}>
-                  <Typography variant="h5"> {file_name}</Typography>
+                  <Typography variant="h5"> {file.name}</Typography>
                 </ListItemText>
+                <div className="audio-player">
+                  <audio controls>
+                    <source src={file.path} type="audio/mp3" />
+                    Audio is not supported
+                  </audio>
+                </div>
                 {/* <ListItemIcon>
                   <IconButton
                     onClick={() => {
@@ -99,7 +108,7 @@ function ManageAudioFiles(): JSX.Element {
                   <IconButton
                     color="error"
                     onClick={() => {
-                      setSelectedFile(file_name)
+                      setSelectedFile(file)
                       setConfirmationOpen(true)
                     }}
                   >
@@ -141,7 +150,7 @@ function ManageAudioFiles(): JSX.Element {
         onClose={() => setConfirmationOpen(false)}
         onConfirm={async () => {
           if (!selectedFile) return
-          await deleteAudioFile(selectedFile)
+          await deleteAudioFile(selectedFile.name)
           setMusicFiles((prev) => prev.filter((file) => file !== selectedFile))
           setConfirmationOpen(false)
         }}
@@ -150,10 +159,10 @@ function ManageAudioFiles(): JSX.Element {
         open={nameDialogOpen}
         title="Rename this file"
         label="Rename"
-        text={selectedFile || ''}
+        text={selectedFile?.name || ''}
         onClose={() => setNameDialogOpen(false)}
         onSubmit={async (newFileName) => {
-          if (selectedFile) await renameAudioFile(selectedFile, newFileName)
+          if (selectedFile) await renameAudioFile(selectedFile.name, newFileName)
           setNameDialogOpen(false)
         }}
       />

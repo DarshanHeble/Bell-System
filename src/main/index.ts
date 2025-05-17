@@ -4,18 +4,21 @@ import {
   BrowserWindow,
   nativeTheme,
   powerSaveBlocker,
-  powerMonitor
-  // Notification
+  powerMonitor,
+  protocol,
+  net,
+  session
 } from 'electron'
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import { addOtherData } from './utils'
 import { mkdirSync } from 'fs'
-import { projectMusicDirPath } from '@shared/constant'
+import { CUSTOM_PROTOCOL_SCHEME, projectMusicDirPath } from '@shared/constant'
 import migrateData from './utils/migrateData'
 import setupIpcHandlers from './setupIpcHandlers'
+import { pathToFileURL } from 'url'
 
 // set app name
 app.setName('Bell System')
@@ -27,6 +30,21 @@ nativeTheme.themeSource = 'dark'
 mkdirSync(projectMusicDirPath, { recursive: true })
 addOtherData() //add other data in db
 migrateData()
+console.log(projectMusicDirPath)
+
+// Register the custom protocol as privileged
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: CUSTOM_PROTOCOL_SCHEME,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true, // Important: allows the protocol to be used for streaming responses (like media)
+      corsEnabled: true
+    }
+  }
+])
 
 app.on('ready', () => {
   // Prevent display sleep
@@ -40,6 +58,21 @@ app.on('ready', () => {
   })
 })
 
+// function getMimeType(extension): string {
+//   switch (extension.toLowerCase()) {
+//     case '.mp3':
+//       return 'audio/mpeg'
+//     case '.ogg':
+//       return 'audio/ogg'
+//     case '.wav':
+//       return 'audio/wav'
+//     case '.aac':
+//       return 'audio/aac'
+//     default:
+//       return 'application/octet-stream' // Default binary type
+//   }
+// }
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -51,6 +84,7 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
+      // webSecurity: false
     }
   })
 
@@ -93,6 +127,83 @@ app.whenReady().then(() => {
   setupIpcHandlers()
 
   createWindow()
+
+  // Get the default session (or a specific one if you use multiple sessions)
+  const ses = session.defaultSession
+
+  // Handle requests for the custom protocol
+  // This replaces protocol.registerFileProtocol
+  ses.protocol.handle(CUSTOM_PROTOCOL_SCHEME, async (request) => {
+    let extractedPathFromUrl = request.url.substring(CUSTOM_PROTOCOL_SCHEME.length + 3) // e.g., "c/Users/..." or "C:/Users/..."
+
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Original Request URL: ${request.url}`)
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Extracted path from URL: ${extractedPathFromUrl}`)
+
+    // --- CRITICAL CHANGE HERE ---
+    // If the path starts with a drive letter (e.g., "c/" or "C/"), re-format it to "C:/"
+    // to ensure path.resolve treats it as an absolute path from that drive.
+    if (/^[a-zA-Z]\//.test(extractedPathFromUrl)) {
+      // Does it start with "letter/" ?
+      extractedPathFromUrl =
+        extractedPathFromUrl.charAt(0) + ':' + extractedPathFromUrl.substring(1) // "c/" -> "c:/"
+    }
+    // Now extractedPathFromUrl should be like "c:/Users/..." or "C:/Users/..."
+
+    const decodedFilePath = resolve(decodeURIComponent(extractedPathFromUrl))
+
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Path for path.resolve: ${extractedPathFromUrl}`)
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Decoded and Resolved File Path: ${decodedFilePath}`)
+
+    // ... (rest of your logging and security checks remain the same)
+    const userMusicDir = app.getPath('music')
+    // const projectMusicDirPath = ... (ensure it's defined)
+    // Make sure projectMusicDirPath is defined in this scope for the comparison
+    // Example: import { projectMusicDirPath as sharedProjectMusicDirPath } from '@shared/constant';
+    // const projectMusicDirPath = sharedProjectMusicDirPath;
+    // OR const projectMusicDirPath = join(app.getPath('music'), 'BellSystem');
+
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] User Music Dir: ${userMusicDir}`)
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Project Music Dir Path: ${projectMusicDirPath}`)
+
+    const normalizedDecodedPath = decodedFilePath.toLowerCase()
+    const normalizedUserMusicDir = userMusicDir.toLowerCase()
+    const normalizedProjectMusicDir = projectMusicDirPath ? projectMusicDirPath.toLowerCase() : ''
+
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Normalized Decoded Path: ${normalizedDecodedPath}`)
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Normalized User Music Dir: ${normalizedUserMusicDir}`)
+    console.log(
+      `[${CUSTOM_PROTOCOL_SCHEME}] Normalized Project Music Dir: ${normalizedProjectMusicDir}`
+    )
+
+    if (
+      !normalizedDecodedPath.startsWith(normalizedUserMusicDir) &&
+      (!projectMusicDirPath || !normalizedDecodedPath.startsWith(normalizedProjectMusicDir))
+    ) {
+      console.error(
+        `[${CUSTOM_PROTOCOL_SCHEME}] ACCESS DENIED. Path: ${decodedFilePath}. Not in allowed: ${userMusicDir} OR ${projectMusicDirPath}`
+      )
+      return new Response(null, { status: 403, statusText: 'Forbidden' })
+    }
+
+    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Access GRANTED to: ${decodedFilePath}`)
+    try {
+      const fileUrl = pathToFileURL(decodedFilePath).href
+      console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Serving file URL for net.fetch: ${fileUrl}`)
+      const response = await net.fetch(fileUrl, {
+        method: request.method,
+        headers: request.headers
+      })
+      return response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(`[${CUSTOM_PROTOCOL_SCHEME}] Error serving file ${decodedFilePath}:`, error)
+      let status = 500
+      if (error.message.includes('ERR_FILE_NOT_FOUND') || error.code === 'ENOENT') {
+        status = 404
+      }
+      return new Response(null, { status, statusText: error.message || 'Internal Server Error' })
+    }
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
