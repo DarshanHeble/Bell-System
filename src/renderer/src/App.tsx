@@ -58,16 +58,14 @@ function App(): JSX.Element {
       <div style={{ display: 'flex', height: '-webkit-fill-available' }}>
         <Sidebar />
         <Routes>
-          {isVerified ? (
+          {!isVerified ? (
             <>
               <Route path="/" element={<Navigate to={defaultRoute} replace />} />
               <Route path="/tabs/:tabId" Component={BellTab} />
               <Route path="/manageAudioFiles" Component={ManageAudioFiles} />
             </>
           ) : (
-            <>
-              <Route path="/" element={<Lock setVerified={setIsVerified} />} />
-            </>
+            <Route path="/" element={<Lock setVerified={setIsVerified} />} />
           )}
         </Routes>
       </div>

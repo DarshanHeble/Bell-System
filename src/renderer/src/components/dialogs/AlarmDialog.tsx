@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -54,6 +54,26 @@ const AlarmDialog: React.FC<AddAlarmDialogProps> = ({
   const [label, setLabel] = useState('Period')
   const [selectedDays, setSelectedDays] = useState<string[]>(['S', 'M', 'Tu', 'W', 'T', 'F', 'Sa'])
   const [selectedSound, setSelectedSound] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      // When the dialog is open and music data is available
+      if (allMusic && allMusic.length > 0) {
+        // If no sound is currently selected (e.g., initial state or after reset)
+        if (selectedSound === null) {
+          setSelectedSound(allMusic[0].name)
+        }
+      } else if (selectedSound !== null) {
+        // If dialog is open but no music is available, ensure selectedSound is null
+        setSelectedSound(null)
+      }
+    } else {
+      // When the dialog closes, reset selectedSound to null for the next opening
+      if (selectedSound !== null) {
+        setSelectedSound(null)
+      }
+    }
+  }, [open, allMusic, selectedSound])
 
   const handleHourClick = (event): void => {
     setAnchorElHour(event.currentTarget)
