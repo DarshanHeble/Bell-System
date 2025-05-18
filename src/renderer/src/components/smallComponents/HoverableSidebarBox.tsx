@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { Box, Button, Divider, IconButton, Menu, MenuItem } from '@mui/material'
 import { Alarm, MoreVert, EditOutlined, DeleteOutlined } from '@mui/icons-material'
 import { TabWithOutTimeData } from '@shared/type'
-import RenameTabDialog from '../dialogs/RenameTabDialog'
 import { updateActiveTab } from '@renderer/api'
 import { useNavigate } from 'react-router-dom'
+import NameDialog from '../dialogs/NameDialog'
 
 interface HoverableSidebarBoxProps {
   data: TabWithOutTimeData
@@ -24,7 +24,8 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
   const navigate = useNavigate()
 
   const [isHovered, setIsHovered] = useState(false)
-  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  // const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  const [nameDialogOpen, setNameDialogOpen] = useState(false)
   const [openSidebaranchorEl, setOpenSidebaranchorEl] = useState<null | HTMLElement>(null)
   const openSidebarTabMenu = Boolean(openSidebaranchorEl)
 
@@ -37,7 +38,7 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
   }
 
   const EditTabName = (): void => {
-    setRenameDialogOpen(true)
+    setNameDialogOpen(true)
     handleClose()
   }
 
@@ -47,8 +48,9 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
     handleClose()
   }
 
-  const tabRename = async (_id: string, newTabName: string): Promise<void> => {
-    onTabRename(_id, newTabName)
+  const handleTabRename = async (newTabName: string): Promise<void> => {
+    await window.electron.ipcRenderer.invoke('renameTab', data._id, newTabName)
+    onTabRename(data._id, newTabName)
   }
 
   const handleActiveTab = (): void => {
@@ -106,9 +108,6 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
         open={openSidebarTabMenu}
         anchorEl={openSidebaranchorEl}
         onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'sidebarMoreIcon'
-        }}
       >
         <MenuItem onClick={EditTabName} sx={{ gap: '12px' }}>
           <EditOutlined />
@@ -120,12 +119,13 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
           Delete
         </MenuItem>
       </Menu>
-      <RenameTabDialog
-        open={renameDialogOpen}
-        onClose={() => setRenameDialogOpen(false)}
-        _id={data._id}
-        oldTabName={data.tab_name}
-        onRenameTab={tabRename}
+      <NameDialog
+        open={nameDialogOpen}
+        onClose={() => setNameDialogOpen(false)}
+        title="Rename the Tab"
+        label="Rename"
+        text={data.tab_name}
+        onSubmit={handleTabRename}
       />
     </Box>
   )

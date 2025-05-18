@@ -8,12 +8,15 @@ import { Add, DeleteOutlined } from '@mui/icons-material'
 import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
 import { useAddBell, useBells, useDeleteBell } from '@renderer/hooks/bells'
 import { addToQueue, bellQueue, clearQueue, processNextBell } from '@renderer/bellQueue'
+import AlarmDialogV2 from '@renderer/components/dialogs/AlarmDialogV2'
 
 const BellTab = (): JSX.Element => {
   const { tabId } = useParams<{ tabId: string }>()
   const [open, setOpen] = useState(false)
-  const handleOpen = (): void => setOpen(true)
-  const handleClose = (): void => setOpen(false)
+  const [openV2, setOpenV2] = useState(false)
+
+  const handleOpen = (): void => setOpenV2(true)
+  const handleClose = (): void => setOpenV2(false)
 
   const [cardContextMenu, setCardContextMenu] = useState<{
     mouseX: number
@@ -96,7 +99,14 @@ const BellTab = (): JSX.Element => {
           open={open}
           handleClose={handleClose}
           onTimeAdd={handleTimeAdd}
-          activeTab={tabId || ''}
+          activeTab={tabId}
+        />
+        <AlarmDialogV2
+          open={openV2}
+          activeTab={tabId}
+          title="Create New Bell"
+          handleClose={handleClose}
+          onTimeAdd={handleTimeAdd}
         />
         <Menu
           id="cardMenu"

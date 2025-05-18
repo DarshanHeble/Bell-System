@@ -157,11 +157,6 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
           </ListItem>
         </List>
       </Box>
-      {/* <NewTabDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onAddTab={handleAddTab}
-      /> */}
       <NameDialog
         open={nameDialogOpen}
         onClose={() => setNameDialogOpen(false)}
