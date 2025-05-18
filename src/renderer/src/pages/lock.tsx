@@ -17,6 +17,7 @@ export default function Lock({ setVerified }: LockProps): JSX.Element {
       if (!response) {
         toast.error('An Error has occurred while updating the database')
       }
+
       toast.success('Password Verified')
       setTimeout(() => {
         setVerified(true) // Update state in parent component
@@ -30,13 +31,16 @@ export default function Lock({ setVerified }: LockProps): JSX.Element {
     <>
       <Box
         display="flex"
+        flex={1}
         justifyContent="center"
         alignItems="center"
-        height="100vh"
         bgcolor="#0e0e0e"
         padding={2}
       >
-        <Paper elevation={3} style={{ padding: '40px', maxWidth: '400px', width: '100%' }}>
+        <Paper
+          elevation={3}
+          style={{ padding: '40px', maxWidth: '400px', width: '100%', backgroundImage: 'none' }}
+        >
           <Typography variant="h5" align="center" gutterBottom>
             Password Verification
           </Typography>

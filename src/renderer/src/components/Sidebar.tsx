@@ -12,17 +12,24 @@ import {
 import HoverableSidebarBox from './smallComponents/HoverableSidebarBox'
 import { Add, AudioFileOutlined } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
-import NewTabDialog from './dialogs/NewTabDialog'
-import { useEffect, useState } from 'react'
-import { Tab, TabWithOutTimeData } from '@shared/type'
+import { FC, useEffect, useState } from 'react'
+import { Tab, TabWithOut_Id, TabWithOutTimeData } from '@shared/type'
 import { fetchTabs } from '@renderer/api'
+import NameDialog from './dialogs/NameDialog'
 
-const Sidebar = (): JSX.Element => {
+interface SidebarProps {
+  tabs: TabWithOutTimeData[]
+  activeTab: string
+  setTabs: React.Dispatch<React.SetStateAction<TabWithOutTimeData[]>>
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>
+}
+
+const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) => {
   const navigate = useNavigate()
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
-  const [tabs, setTabs] = useState<TabWithOutTimeData[]>([])
-  const [activeTab, setActiveTab] = useState<string>('')
+  // const [tabs, setTabs] = useState<TabWithOutTimeData[]>([])
+  // const [activeTab, setActiveTab] = useState<string>('')
 
   // API for fetching data from DB
   useEffect(() => {
@@ -44,20 +51,48 @@ const Sidebar = (): JSX.Element => {
     fetchData()
   }, [])
 
-  const handleAddTab = (newTabData: Tab): void => {
-    tabs.push(newTabData)
+  const handleAddTab = async (tabName: string): Promise<void> => {
+    const newTabData: TabWithOut_Id = {
+      tab_id: tabName,
+      tab_name: tabName,
+      data: []
+    }
 
     // API for data store
-    // window.electron.ipcRenderer.invoke('addTab', newTabData)
+    const _id = await window.electron.ipcRenderer.invoke('addTab', newTabData)
+
+    const finalNewTabData: Tab = {
+      ...newTabData,
+      _id: _id
+    }
+
+    tabs.push(finalNewTabData)
 
     // not needed
     // SetData((prevData) => [...prevData, newTabData])
 
-    setActiveTab(newTabData._id)
+    setActiveTab(finalNewTabData._id)
+    navigate(`/tabs/${_id}`)
   }
 
   const TabDelete = (_id: string): void => {
-    setTabs((previousTabs) => previousTabs.filter((tab: TabWithOutTimeData) => tab._id !== _id))
+    setTabs((previousTabs) => {
+      const updatedTabs = previousTabs.filter((tab: TabWithOutTimeData) => tab._id !== _id)
+
+      // If the active tab is deleted, navigate to the first available tab or fallback
+      if (activeTab === _id) {
+        if (updatedTabs.length > 0) {
+          const firstTab = updatedTabs[0]
+          setActiveTab(firstTab._id)
+          navigate(`/tabs/${firstTab._id}`)
+        } else {
+          setActiveTab('')
+          navigate('tabs/none') // Navigate to a fallback route when no tabs remain
+        }
+      }
+
+      return updatedTabs
+    })
   }
 
   const TabRename = (_id: string, newTabName: string): void => {
@@ -85,7 +120,7 @@ const Sidebar = (): JSX.Element => {
         <Button
           variant="contained"
           startIcon={<Add />}
-          onClick={() => setDialogOpen(true)}
+          onClick={() => setNameDialogOpen(true)}
           sx={{ borderRadius: 5, textTransform: 'none', width: 'fit-content' }}
         >
           New Tab
@@ -107,8 +142,8 @@ const Sidebar = (): JSX.Element => {
             ))}
           </Box>
         )}
-        <Divider sx={{ mt: 'auto' }} />
-        <List>
+        <List sx={{ mt: 'auto' }}>
+          <Divider sx={{ marginBlockEnd: '1rem' }} />
           <ListItem disablePadding sx={{ minWidth: 'max-content' }}>
             <ListItemButton
               sx={{ borderRadius: '5rem' }}
@@ -122,10 +157,17 @@ const Sidebar = (): JSX.Element => {
           </ListItem>
         </List>
       </Box>
-      <NewTabDialog
+      {/* <NewTabDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onAddTab={handleAddTab}
+      /> */}
+      <NameDialog
+        open={nameDialogOpen}
+        onClose={() => setNameDialogOpen(false)}
+        title="Create New Tab"
+        label="Name"
+        onSubmit={handleAddTab}
       />
     </>
   )

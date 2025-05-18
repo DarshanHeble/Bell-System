@@ -8,9 +8,15 @@ import BellTab from './pages/BellTab'
 import Sidebar from './components/Sidebar'
 import { checkUserIsVerified, fetchTabs } from './api'
 import { useQuery } from '@tanstack/react-query'
+import EmptyTabs from './pages/EmptyTabs'
+import { TabWithOutTimeData } from '@shared/type'
 
 function App(): JSX.Element {
   const [isVerified, setIsVerified] = useState<boolean>(false)
+  const [isDataReady, setIsDataReady] = useState<boolean>(false)
+
+  const [tabs, setTabs] = useState<TabWithOutTimeData[]>([])
+  const [activeTab, setActiveTab] = useState<string>('')
 
   const { data: initData, isLoading } = useQuery({
     queryKey: ['init'],
@@ -24,6 +30,7 @@ function App(): JSX.Element {
   useEffect(() => {
     if (initData?.isUserVerified) {
       setIsVerified(initData.isUserVerified)
+      setIsDataReady(true)
     }
   }, [initData])
 
@@ -33,11 +40,15 @@ function App(): JSX.Element {
     const activeTab = tabs.find((tab) => tab.isActive === true)
     const firstTab = tabs[0]
     return {
-      defaultRoute: activeTab ? `/tabs/${activeTab._id}` : firstTab ? `/tabs/${firstTab._id}` : '/'
+      defaultRoute: activeTab
+        ? `/tabs/${activeTab._id}`
+        : firstTab
+          ? `/tabs/${firstTab._id}`
+          : '/tabs/none'
     }
   }, [initData])
 
-  if (isLoading) {
+  if (isLoading || !isDataReady) {
     return (
       <Box
         sx={{
@@ -56,11 +67,29 @@ function App(): JSX.Element {
   return (
     <HashRouter>
       <div style={{ display: 'flex', height: '-webkit-fill-available' }}>
-        <Sidebar />
+        {isVerified && (
+          <Sidebar
+            tabs={tabs}
+            activeTab={activeTab}
+            setTabs={setTabs}
+            setActiveTab={setActiveTab}
+          />
+        )}
         <Routes>
-          {!isVerified ? (
+          {isVerified ? (
             <>
               <Route path="/" element={<Navigate to={defaultRoute} replace />} />
+              <Route
+                path="/tabs/none"
+                element={
+                  <EmptyTabs
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    setTabs={setTabs}
+                    setActiveTab={setActiveTab}
+                  />
+                }
+              />
               <Route path="/tabs/:tabId" Component={BellTab} />
               <Route path="/manageAudioFiles" Component={ManageAudioFiles} />
             </>
