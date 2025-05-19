@@ -1,6 +1,7 @@
 import { Time, TimeData } from '@shared/type'
 import FastPriorityQueue from 'fastpriorityqueue'
 import { playAudio } from './utils/playAudio'
+import { getCurrent24HourTime, getCurrentDayName } from '@shared/utils'
 
 export const bellQueue = new FastPriorityQueue<TimeData>((a, b) => {
   const convertTo24Hour = (time: Time): number =>
@@ -25,14 +26,6 @@ export async function clearQueue(): Promise<void> {
     bellQueue.poll() // Remove the top element until the queue is empty
   }
   console.log('Bell queue cleared.')
-}
-
-// Utility to get the current time in 24-hour format for comparison
-function getCurrent24HourTime(): number {
-  const now = new Date()
-  const hour = now.getHours() // 0-23
-  const minute = now.getMinutes()
-  return hour + minute / 60
 }
 
 let isProcessing = false // Flag to prevent duplicate processing
@@ -61,6 +54,16 @@ export async function processNextBell(): Promise<void> {
       if (!nextBell.switch_state) {
         console.log(`Skipping inactive bell: ${nextBell.label}`)
         bellQueue.poll() // Remove the inactive item
+        continue
+      }
+
+      // Skip inactive items based on current day
+      const currentDay = getCurrentDayName()
+      const daySetting = nextBell.days.find((d) => d.day === currentDay)
+
+      if (!daySetting || !daySetting.active) {
+        console.log(`Skipping bell for ${currentDay} (day not active): ${nextBell.label}`)
+        bellQueue.poll() // Remove the item inactive for today
         continue
       }
 

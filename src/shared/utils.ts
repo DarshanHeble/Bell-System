@@ -19,3 +19,17 @@ export const capitalizeString = (str: string): string => {
   if (!str) return ''
   return str.trim().charAt(0).toUpperCase() + str.trim().slice(1).toLowerCase()
 }
+
+// Utility to get the current time in 24-hour format for comparison
+export function getCurrent24HourTime(): number {
+  const now = new Date()
+  const hour = now.getHours() // 0-23
+  const minute = now.getMinutes()
+  return hour + minute / 60
+}
+
+export function getCurrentDayName(): string {
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const now = new Date()
+  return daysOfWeek[now.getDay()] // getDay() returns 0 for Sunday, 1 for Monday, etc.
+}

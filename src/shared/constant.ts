@@ -27,4 +27,4 @@ export const userMusicDirPath = app.getPath('music')
 export const projectMusicDirPath = path.join(userMusicDirPath, appMusicDirName)
 
 export const AUDIO_EXTENSIONS_REGEX = /\.(mp3|wav|ogg)$/i
-export const CUSTOM_PROTOCOL_SCHEME = 'myaudio'
+export const CUSTOM_PROTOCOL_SCHEME = 'myAudio'

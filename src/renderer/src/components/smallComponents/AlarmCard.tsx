@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Box, Card, CardActionArea, CardContent, Typography, Switch } from '@mui/material'
 import { TimeData } from '@shared/type'
 import { processNextBell } from '@renderer/bellQueue'
+import { daysOfWeek } from '@renderer/constants'
 
 interface AlarmCardProps {
   data: TimeData
@@ -89,7 +90,7 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
                   display={!day.active ? 'none' : ''}
                   color={!isChecked ? 'textDisabled' : 'textSecondary'}
                 >
-                  {day.day}
+                  {daysOfWeek[index]}
                 </Typography>
               ))}
             </Box>

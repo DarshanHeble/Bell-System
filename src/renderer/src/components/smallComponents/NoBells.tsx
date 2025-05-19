@@ -21,7 +21,8 @@ const NoBells = (): JSX.Element => {
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
         No bells
-        <NotificationsOffRounded sx={{ fontSize: '4rem', color: 'gold' }} /> to show.
+        <NotificationsOffRounded sx={{ fontSize: '4rem', color: 'gold' }} />
+        to show.
       </Typography>
     </Container>
   )

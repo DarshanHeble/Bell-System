@@ -20,6 +20,7 @@ import { useAudio } from '@renderer/hooks/audio'
 import { TimeData } from '@shared/type'
 import { getCurrentTime } from '@renderer/utils'
 import { v4 } from 'uuid'
+import { daysOfWeek, fullDayNames } from '@renderer/constants'
 
 interface AlarmDialogV2Props {
   open: boolean
@@ -32,7 +33,6 @@ interface AlarmDialogV2Props {
 
 const hours = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 const minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
-const daysOfWeek = ['S', 'M', 'Tu', 'W', 'T', 'F', 'Sa']
 const amPm = ['am', 'pm']
 
 const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
@@ -135,9 +135,9 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
       time: { hour: Number(time.hour), minute: Number(time.minute), period: time.period },
       label: label || 'period',
       music_file_name: selectedSound || '',
-      days: daysOfWeek.map((day) => ({
-        day,
-        active: selectedDays.includes(day)
+      days: daysOfWeek.map((uiDay, index) => ({
+        day: fullDayNames[index],
+        active: selectedDays.includes(uiDay)
       })),
       switch_state: true
     }
