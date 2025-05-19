@@ -24,6 +24,20 @@ const darkTheme = createTheme({
           backgroundImage: 'none'
         }
       }
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundImage: 'none'
+        }
+      }
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          minWidth: 42
+        }
+      }
     }
   }
 })

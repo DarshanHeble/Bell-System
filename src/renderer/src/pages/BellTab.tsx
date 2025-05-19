@@ -5,14 +5,14 @@ import AlarmCard from '@renderer/components/smallComponents/AlarmCard'
 import { TimeData } from '@shared/type'
 import { useEffect, useState } from 'react'
 import { Add, DeleteOutlined } from '@mui/icons-material'
-import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
+// import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
 import { useAddBell, useBells, useDeleteBell } from '@renderer/hooks/bells'
 import { addToQueue, bellQueue, clearQueue, processNextBell } from '@renderer/bellQueue'
 import AlarmDialogV2 from '@renderer/components/dialogs/AlarmDialogV2'
 
 const BellTab = (): JSX.Element => {
   const { tabId } = useParams<{ tabId: string }>()
-  const [open, setOpen] = useState(false)
+  // const [open, setOpen] = useState(false)
   const [openV2, setOpenV2] = useState(false)
 
   const handleOpen = (): void => setOpenV2(true)
@@ -92,15 +92,15 @@ const BellTab = (): JSX.Element => {
           sx={{ position: 'fixed', bottom: '3rem', right: '3rem', textTransform: 'none' }}
           onClick={handleOpen}
         >
-          <Add sx={{ mr: 1 }} /> New Alarm
+          <Add sx={{ mr: 1 }} /> New Bell
         </Fab>
 
-        <AlarmDialog
+        {/* <AlarmDialog
           open={open}
           handleClose={handleClose}
           onTimeAdd={handleTimeAdd}
           activeTab={tabId}
-        />
+        /> */}
         <AlarmDialogV2
           open={openV2}
           activeTab={tabId}

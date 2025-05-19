@@ -1,3 +1,4 @@
+import { FC, useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -7,15 +8,14 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography
+  ListSubheader
 } from '@mui/material'
-import HoverableSidebarBox from './smallComponents/HoverableSidebarBox'
 import { Add, AudioFileOutlined } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
-import { FC, useEffect, useState } from 'react'
 import { Tab, TabWithOut_Id, TabWithOutTimeData } from '@shared/type'
 import { fetchTabs } from '@renderer/api'
 import NameDialog from './dialogs/NameDialog'
+import TabList from './smallComponents/TabList'
 
 interface SidebarProps {
   tabs: TabWithOutTimeData[]
@@ -27,9 +27,6 @@ interface SidebarProps {
 const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) => {
   const navigate = useNavigate()
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
-
-  // const [tabs, setTabs] = useState<TabWithOutTimeData[]>([])
-  // const [activeTab, setActiveTab] = useState<string>('')
 
   // API for fetching data from DB
   useEffect(() => {
@@ -108,13 +105,15 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
     <>
       <Box
         sx={{
-          minWidth: '15rem',
+          minWidth: '17rem',
+          maxWidth: '17rem',
           height: '-webkit-fill-available',
           display: 'flex',
           flexDirection: 'column',
           gap: 3,
           p: '1rem',
-          bgcolor: '#202020'
+          borderRight: '1px solid #202020'
+          // bgcolor: '#202020'
         }}
       >
         <Button
@@ -129,17 +128,20 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
           ' No Tabs Found'
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: 1 }}>
-            <Typography>All Tabs</Typography>
-            {tabs.map((data, index) => (
-              <HoverableSidebarBox
-                key={index}
-                data={data}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                onTabDelete={TabDelete}
-                onTabRename={TabRename}
-              />
-            ))}
+            {/* <Typography>All Tabs</Typography> */}
+            <List>
+              <ListSubheader sx={{ bgcolor: 'transparent' }}>All Tabs</ListSubheader>
+              {tabs.map((data, index) => (
+                <TabList
+                  key={index}
+                  data={data}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  onTabDelete={TabDelete}
+                  onTabRename={TabRename}
+                />
+              ))}
+            </List>
           </Box>
         )}
         <List sx={{ mt: 'auto' }}>

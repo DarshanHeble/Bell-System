@@ -81,7 +81,7 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
         </CardContent>
       </CardActionArea>
       <Switch
-        sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
+        sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}
         checked={isChecked}
         onChange={handleSwitchOnChange}
       />

@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
-import { FC } from 'react'
+import { FC, useEffect, useRef } from 'react'
 
 interface ConfirmationDialogProps {
   open: boolean
@@ -16,13 +16,23 @@ const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
   onClose,
   onConfirm
 }) => {
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (open) {
+      btnRef.current?.focus()
+    }
+  }, [open])
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{message}</DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={onConfirm}>Delete</Button>
+        <Button ref={btnRef} color="error" onClick={onConfirm}>
+          Delete
+        </Button>
       </DialogActions>
     </Dialog>
   )

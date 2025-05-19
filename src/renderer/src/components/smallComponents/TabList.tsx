@@ -1,12 +1,22 @@
-import React, { useState } from 'react'
-import { Box, Button, Divider, IconButton, Menu, MenuItem, Typography } from '@mui/material'
+import { FC, useState } from 'react'
+import {
+  Divider,
+  IconButton,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Typography
+} from '@mui/material'
 import { Alarm, MoreVert, EditOutlined, DeleteOutlined } from '@mui/icons-material'
 import { TabWithOutTimeData } from '@shared/type'
 import { updateActiveTab } from '@renderer/api'
 import { useNavigate } from 'react-router-dom'
 import NameDialog from '../dialogs/NameDialog'
 
-interface HoverableSidebarBoxProps {
+interface TabListProps {
   data: TabWithOutTimeData
   activeTab: string
   setActiveTab: (id: string) => void
@@ -14,17 +24,9 @@ interface HoverableSidebarBoxProps {
   onTabRename: (tabName: string, newTabName: string) => void
 }
 
-const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
-  data,
-  activeTab,
-  setActiveTab,
-  onTabDelete,
-  onTabRename
-}) => {
+const TabList: FC<TabListProps> = ({ data, activeTab, setActiveTab, onTabDelete, onTabRename }) => {
   const navigate = useNavigate()
 
-  const [isHovered, setIsHovered] = useState(false)
-  // const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
   const [openSidebaranchorEl, setOpenSidebaranchorEl] = useState<null | HTMLElement>(null)
   const openSidebarTabMenu = Boolean(openSidebaranchorEl)
@@ -60,53 +62,54 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
   }
 
   return (
-    <Box
-      sx={{ position: 'relative' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onContextMenu={handleClick}
-    >
-      <Button
-        variant="contained"
-        startIcon={<Alarm />}
-        onClick={handleActiveTab}
+    <>
+      <ListItem
+        disablePadding
+        secondaryAction={
+          <IconButton
+            id="sidebarMoreIcon"
+            aria-controls={openSidebarTabMenu ? 'basic-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={openSidebarTabMenu ? 'true' : undefined}
+            onClick={handleClick}
+            sx={{
+              visibility: 'hidden',
+              color: data._id === activeTab ? 'black' : ''
+            }}
+            edge="end"
+          >
+            <MoreVert />
+          </IconButton>
+        }
         sx={{
-          borderRadius: 5,
-          textTransform: 'none',
-          justifyContent: 'start',
-          // bgcolor: data._id === activeTab ? '' : 'white',
-          bgcolor: data._id === activeTab ? '' : '#333333',
-          color: data._id === activeTab ? '' : '#dcdcdcdc',
-          zIndex: 3,
-          width: '100%'
+          borderRadius: '5rem',
+          bgcolor: data._id === activeTab ? 'primary.main' : '',
+          '&:hover .MuiListItemSecondaryAction-root .MuiIconButton-root': {
+            visibility: 'visible'
+          }
         }}
       >
-        <Typography
-          variant="subtitle2"
-          sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
-        >
-          {data.tab_name}
-        </Typography>
-      </Button>
-      {isHovered && (
-        <IconButton
-          id="sidebarMoreIcon"
-          aria-controls={openSidebarTabMenu ? 'basic-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={openSidebarTabMenu ? 'true' : undefined}
-          onClick={handleClick}
+        <ListItemButton
+          onContextMenu={handleClick}
+          onClick={handleActiveTab}
           sx={{
-            color: 'black',
-            position: 'absolute',
-            top: -2,
-            right: 0,
-            zIndex: 4
+            borderRadius: '5rem',
+            color: data._id === activeTab ? 'black' : 'gray'
           }}
         >
-          <MoreVert />
-        </IconButton>
-      )}
-
+          <ListItemIcon>
+            <Alarm sx={{ color: data._id === activeTab ? 'black' : 'gray' }} />
+          </ListItemIcon>
+          <ListItemText>
+            <Typography
+              variant="subtitle2"
+              sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+            >
+              {data.tab_name}
+            </Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
       <Menu
         id="basic-menu"
         open={openSidebarTabMenu}
@@ -118,7 +121,7 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
           Rename
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => DeleteTab(data._id)} sx={{ gap: '12px' }}>
+        <MenuItem onClick={() => DeleteTab(data._id)} sx={{ gap: '12px', color: 'red' }}>
           <DeleteOutlined />
           Delete
         </MenuItem>
@@ -131,8 +134,8 @@ const HoverableSidebarBox: React.FC<HoverableSidebarBoxProps> = ({
         text={data.tab_name}
         onSubmit={handleTabRename}
       />
-    </Box>
+    </>
   )
 }
 
-export default HoverableSidebarBox
+export default TabList

@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { CloseOutlined, LabelOutlined, MusicNoteOutlined } from '@mui/icons-material'
 import {
   Autocomplete,
@@ -21,6 +21,7 @@ import { TimeData } from '@shared/type'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { getCurrentTime } from '@renderer/utils'
+import { v4 } from 'uuid'
 
 interface AlarmDialogV2Props {
   open: boolean
@@ -38,9 +39,9 @@ const amPm = ['am', 'pm']
 const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
   open,
   title,
-  handleClose
-  //   onTimeAdd,
-  //   activeTab
+  handleClose,
+  onTimeAdd,
+  activeTab
 }) => {
   const { data: allMusic } = useAudio()
   const { hour, minute, period } = getCurrentTime()
@@ -58,7 +59,7 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
     }
   )
 
-  const [selectedDays, setSelectedDays] = useState<string[]>(['S', 'M', 'Tu', 'W', 'T', 'F', 'Sa'])
+  const [selectedDays, setSelectedDays] = useState<string[]>(['M', 'Tu', 'W', 'T', 'F', 'Sa'])
   const [selectedSound, setSelectedSound] = useState<string | null>(null)
   const [label, setLabel] = useState('Period')
 
@@ -66,6 +67,26 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
   const [isHovered, setIsHovered] = useState(false)
   const showClearIcon = (): void => setIsHovered(true)
   const hideClearIcon = (): void => setIsHovered(false)
+
+  useEffect(() => {
+    if (open) {
+      // When the dialog is open and music data is available
+      if (allMusic && allMusic.length > 0) {
+        // If no sound is currently selected (e.g., initial state or after reset)
+        if (selectedSound === null) {
+          setSelectedSound(allMusic[0].name)
+        }
+      } else if (selectedSound !== null) {
+        // If dialog is open but no music is available, ensure selectedSound is null
+        setSelectedSound(null)
+      }
+    } else {
+      // When the dialog closes, reset selectedSound to null for the next opening
+      if (selectedSound !== null) {
+        setSelectedSound(null)
+      }
+    }
+  }, [open, allMusic, selectedSound])
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -91,9 +112,40 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
     handleMenuClose()
   }
 
+  const handleScroll = (e: React.WheelEvent<HTMLDivElement>, type: 'hour' | 'minute'): void => {
+    const change = e.deltaY < 0 ? 1 : -1
+    setTime((prev) => {
+      const newValue =
+        type === 'hour'
+          ? (Number(prev.hour) + change + 12) % 12 || 12
+          : (Number(prev.minute) + change + 60) % 60
+      return {
+        ...prev,
+        [type]: newValue.toString().padStart(2, '0')
+      }
+    })
+  }
+
+  const handleSave = (): void => {
+    const newData: TimeData = {
+      id: v4(),
+      time: { hour: Number(time.hour), minute: Number(time.minute), period: time.period },
+      label,
+      music_file_name: selectedSound || '',
+      days: daysOfWeek.map((day) => ({
+        day,
+        active: selectedDays.includes(day)
+      })),
+      switch_state: true
+    }
+
+    onTimeAdd(activeTab, newData)
+    handleClose()
+  }
+
   return (
     <>
-      <Dialog open={open} onClose={handleClose} component={'form'} onSubmit={handleClose}>
+      <Dialog open={open} onClose={handleClose} component={'form'} onSubmit={handleSave}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {/* Time */}
@@ -104,6 +156,7 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
                 color="primary"
                 label={time.hour}
                 onClick={(e) => handleMenuOpen(e, 'hour')}
+                onWheel={(e) => handleScroll(e, 'hour')}
                 sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem', borderRadius: 3 }}
               />
               <Typography
@@ -119,7 +172,8 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
                 variant="outlined"
                 color="primary"
                 label={time.minute}
-                onClick={(e) => handleMenuOpen(e, 'hour')}
+                onClick={(e) => handleMenuOpen(e, 'minute')}
+                onWheel={(e) => handleScroll(e, 'minute')}
                 sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem', borderRadius: 3 }}
               />
 
@@ -185,23 +239,6 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
             />
           </div>
 
-          {/* Days */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-            {daysOfWeek.map((day, index) => (
-              <Chip
-                key={index}
-                label={day}
-                variant={selectedDays.includes(day) ? 'filled' : 'outlined'}
-                // color={selectedDays.includes(day) ? 'secondary' : 'primary'}
-                color="primary"
-                onClick={() => {
-                  handleChipClick(day)
-                }}
-                sx={{ borderRadius: '50%', width: '2.6rem', height: '2.6rem' }}
-              />
-            ))}
-          </div>
-
           {/* Music */}
           <div>
             <Autocomplete
@@ -229,6 +266,22 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
               )}
               onChange={(_, newValue) => setSelectedSound(newValue?.name || null)}
             />
+          </div>
+
+          {/* Days */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+            {daysOfWeek.map((day, index) => (
+              <Chip
+                key={index}
+                label={day}
+                variant={selectedDays.includes(day) ? 'filled' : 'outlined'}
+                color="primary"
+                onClick={() => {
+                  handleChipClick(day)
+                }}
+                sx={{ borderRadius: '50%', width: '2.6rem', height: '2.6rem' }}
+              />
+            ))}
           </div>
         </DialogContent>
 
