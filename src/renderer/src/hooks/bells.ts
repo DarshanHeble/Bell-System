@@ -8,7 +8,7 @@ import {
   UseQueryResult
 } from '@tanstack/react-query'
 
-export const useBells = (tabId: string): UseQueryResult<Tab | undefined, Error> => {
+export const useBells = (tabId?: string): UseQueryResult<Tab | undefined, Error> => {
   return useQuery({
     queryKey: ['bellTab', tabId],
     queryFn: async () => {
@@ -20,7 +20,9 @@ export const useBells = (tabId: string): UseQueryResult<Tab | undefined, Error> 
   })
 }
 
-export const useAddBell = (tabId: string): UseMutationResult<boolean, Error, TimeData, unknown> => {
+export const useAddBell = (
+  tabId?: string
+): UseMutationResult<boolean, Error, TimeData, unknown> => {
   const queryClient = useQueryClient()
 
   return useMutation<boolean, Error, TimeData>({

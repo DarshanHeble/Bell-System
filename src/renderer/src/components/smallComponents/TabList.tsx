@@ -74,7 +74,7 @@ const TabList: FC<TabListProps> = ({ data, activeTab, setActiveTab, onTabDelete,
             onClick={handleClick}
             sx={{
               visibility: 'hidden',
-              color: data._id === activeTab ? 'black' : ''
+              color: data._id === activeTab ? 'black' : 'gray'
             }}
             edge="end"
           >

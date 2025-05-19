@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useState } from 'react'
 import {
   Box,
   Button,
@@ -13,7 +13,6 @@ import {
 import { Add, AudioFileOutlined } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { Tab, TabWithOut_Id, TabWithOutTimeData } from '@shared/type'
-import { fetchTabs } from '@renderer/api'
 import NameDialog from './dialogs/NameDialog'
 import TabList from './smallComponents/TabList'
 
@@ -27,26 +26,6 @@ interface SidebarProps {
 const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) => {
   const navigate = useNavigate()
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
-
-  // API for fetching data from DB
-  useEffect(() => {
-    const fetchData = async (): Promise<void> => {
-      try {
-        const fetchedTabs: TabWithOutTimeData[] = await fetchTabs()
-        // console.log('fetchedTabs', fetchedTabs)
-        setTabs(fetchedTabs)
-
-        if (fetchedTabs.length > 0) {
-          setActiveTab(fetchedTabs[0]._id)
-          // console.log('set active', activeTab)
-        }
-      } catch (error) {
-        console.error('Error fetching tabs:', error)
-      }
-    }
-
-    fetchData()
-  }, [])
 
   const handleAddTab = async (tabName: string): Promise<void> => {
     const newTabData: TabWithOut_Id = {
@@ -107,13 +86,13 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
         sx={{
           minWidth: '17rem',
           maxWidth: '17rem',
-          height: '-webkit-fill-available',
+          // height: '-webkit-fill-available',
           display: 'flex',
           flexDirection: 'column',
+          flex: 1,
           gap: 3,
           p: '1rem',
           borderRight: '1px solid #202020'
-          // bgcolor: '#202020'
         }}
       >
         <Button
@@ -128,7 +107,6 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
           ' No Tabs Found'
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: 1 }}>
-            {/* <Typography>All Tabs</Typography> */}
             <List>
               <ListSubheader sx={{ bgcolor: 'transparent' }}>All Tabs</ListSubheader>
               {tabs.map((data, index) => (

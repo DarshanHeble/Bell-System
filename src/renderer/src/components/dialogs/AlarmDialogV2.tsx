@@ -18,8 +18,6 @@ import {
 } from '@mui/material'
 import { useAudio } from '@renderer/hooks/audio'
 import { TimeData } from '@shared/type'
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { getCurrentTime } from '@renderer/utils'
 import { v4 } from 'uuid'
 
@@ -27,6 +25,7 @@ interface AlarmDialogV2Props {
   open: boolean
   activeTab: string
   title: string
+  timeLength: number
   handleClose: () => void
   onTimeAdd: (_id: string, newTimeData: TimeData) => void
 }
@@ -39,6 +38,7 @@ const amPm = ['am', 'pm']
 const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
   open,
   title,
+  timeLength,
   handleClose,
   onTimeAdd,
   activeTab
@@ -61,7 +61,7 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
 
   const [selectedDays, setSelectedDays] = useState<string[]>(['M', 'Tu', 'W', 'T', 'F', 'Sa'])
   const [selectedSound, setSelectedSound] = useState<string | null>(null)
-  const [label, setLabel] = useState('Period')
+  const [label, setLabel] = useState<string | null>(null)
 
   //   only for label textfield
   const [isHovered, setIsHovered] = useState(false)
@@ -72,6 +72,7 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
     if (open) {
       // When the dialog is open and music data is available
       if (allMusic && allMusic.length > 0) {
+        setLabel(`Period ${timeLength + 1}`)
         // If no sound is currently selected (e.g., initial state or after reset)
         if (selectedSound === null) {
           setSelectedSound(allMusic[0].name)
@@ -84,6 +85,8 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
       // When the dialog closes, reset selectedSound to null for the next opening
       if (selectedSound !== null) {
         setSelectedSound(null)
+        // set label to null
+        setLabel(null)
       }
     }
   }, [open, allMusic, selectedSound])
@@ -130,7 +133,7 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
     const newData: TimeData = {
       id: v4(),
       time: { hour: Number(time.hour), minute: Number(time.minute), period: time.period },
-      label,
+      label: label || 'period',
       music_file_name: selectedSound || '',
       days: daysOfWeek.map((day) => ({
         day,
@@ -149,68 +152,66 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
         <DialogTitle>{title}</DialogTitle>
         <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {/* Time */}
-          <div>
-            <Container sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-              <Chip
-                variant="outlined"
-                color="primary"
-                label={time.hour}
-                onClick={(e) => handleMenuOpen(e, 'hour')}
-                onWheel={(e) => handleScroll(e, 'hour')}
-                sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem', borderRadius: 3 }}
-              />
-              <Typography
-                sx={{
-                  display: 'grid',
-                  placeItems: 'center',
-                  fontWeight: 'bold'
-                }}
-              >
-                :
-              </Typography>
-              <Chip
-                variant="outlined"
-                color="primary"
-                label={time.minute}
-                onClick={(e) => handleMenuOpen(e, 'minute')}
-                onWheel={(e) => handleScroll(e, 'minute')}
-                sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem', borderRadius: 3 }}
-              />
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  gap: 5
-                }}
-              >
-                {amPm.map((item) => (
-                  <Chip
-                    key={item}
-                    // variant="outlined"
-                    label={item}
-                    variant={time.period === item ? 'filled' : 'outlined'}
-                    color={time.period === item ? 'secondary' : 'default'}
-                    onClick={() => handleTimeUpdate('period', item)}
-                    sx={{
-                      // fontWeight: 'bold',
-                      textTransform: 'none',
-                      fontSize: 'medium',
-                      height: '2.3rem',
-                      borderRadius: 3
-                    }}
-                  />
-                ))}
-              </div>
-            </Container>
-            <LocalizationProvider dateAdapter={AdapterDayjs}></LocalizationProvider>
-          </div>
+          <Container sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+            <Chip
+              variant="outlined"
+              color="primary"
+              label={time.hour}
+              onClick={(e) => handleMenuOpen(e, 'hour')}
+              onWheel={(e) => handleScroll(e, 'hour')}
+              sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem', borderRadius: 3 }}
+            />
+            <Typography
+              sx={{
+                display: 'grid',
+                placeItems: 'center',
+                fontWeight: 'bold'
+              }}
+            >
+              :
+            </Typography>
+            <Chip
+              variant="outlined"
+              color="primary"
+              label={time.minute}
+              onClick={(e) => handleMenuOpen(e, 'minute')}
+              onWheel={(e) => handleScroll(e, 'minute')}
+              sx={{ fontSize: 'xx-large', width: '5rem', height: '5rem', borderRadius: 3 }}
+            />
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: 5
+              }}
+            >
+              {amPm.map((item) => (
+                <Chip
+                  key={item}
+                  // variant="outlined"
+                  label={item}
+                  variant={time.period === item ? 'filled' : 'outlined'}
+                  color={time.period === item ? 'secondary' : 'default'}
+                  onClick={() => handleTimeUpdate('period', item)}
+                  sx={{
+                    textTransform: 'none',
+                    fontSize: 'medium',
+                    height: '2.3rem',
+                    borderRadius: 3
+                  }}
+                />
+              ))}
+            </div>
+          </Container>
+
           {/* Label */}
           <div>
             <TextField
               fullWidth
-              value={label}
+              value={label || ''}
               onMouseEnter={showClearIcon}
               onMouseLeave={hideClearIcon}
               margin="normal"
@@ -243,9 +244,8 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
           <div>
             <Autocomplete
               options={allMusic || []}
-              defaultValue={allMusic?.[0]}
               getOptionLabel={(option) => option.name || ''}
-              value={allMusic?.find((audio) => audio.name == selectedSound)}
+              value={allMusic?.find((audio) => audio.name == selectedSound) || null}
               renderOption={(props, option) => (
                 <li {...props} key={option.name}>
                   {option.name}

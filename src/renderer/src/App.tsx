@@ -22,6 +22,9 @@ function App(): JSX.Element {
     queryKey: ['init'],
     queryFn: async () => {
       const [isUserVerified, fetchedTabs] = await Promise.all([checkUserIsVerified(), fetchTabs()])
+      setTabs(fetchedTabs)
+      setActiveTab(fetchedTabs[0]._id)
+
       return { isUserVerified, fetchedTabs }
     }
   })
@@ -38,6 +41,7 @@ function App(): JSX.Element {
   const { defaultRoute } = useMemo(() => {
     const tabs = initData?.fetchedTabs || []
     const activeTab = tabs.find((tab) => tab.isActive === true)
+    if (activeTab) setActiveTab(activeTab._id)
     const firstTab = tabs[0]
     return {
       defaultRoute: activeTab

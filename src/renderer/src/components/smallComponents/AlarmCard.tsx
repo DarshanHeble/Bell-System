@@ -10,6 +10,7 @@ interface AlarmCardProps {
 }
 
 const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) => {
+  // const theme = useTheme()
   const [isChecked, setIsChecked] = useState<boolean>(data.switch_state)
 
   const handleContextMenu = (event: React.MouseEvent): void => {
@@ -44,7 +45,17 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
         height: 'max-content'
       }}
     >
-      <CardActionArea onContextMenu={handleContextMenu} onClick={handleContextMenu}>
+      <CardActionArea
+        onContextMenu={handleContextMenu}
+        onClick={handleContextMenu}
+        sx={{
+          // Target the ripple effect
+          '& .MuiTouchRipple-ripple .MuiTouchRipple-child': {
+            backgroundColor: '#656565'
+            // backgroundColor: alpha(theme.palette.primary.main, 0.6)
+          }
+        }}
+      >
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'start', alignItems: 'baseline' }}>
             <Typography
@@ -63,7 +74,7 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
               {data.time.period}
             </Typography>
           </Box>
-          <Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.1 }}>
             <Typography color={!isChecked ? 'textDisabled' : 'textPrimary'}>
               {data.label}
             </Typography>
@@ -72,7 +83,12 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
             </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
               {data.days.map((day, index) => (
-                <Typography key={index} color={!isChecked ? 'textDisabled' : 'textSecondary'}>
+                <Typography
+                  key={index}
+                  variant="body2"
+                  display={!day.active ? 'none' : ''}
+                  color={!isChecked ? 'textDisabled' : 'textSecondary'}
+                >
                   {day.day}
                 </Typography>
               ))}

@@ -34,7 +34,7 @@ const BellTab = (): JSX.Element => {
     })
   }
 
-  if (!tabId) return <>No ID found</>
+  // if (!tabId) return <>No ID found</>
 
   const { data: bells, isLoading: isBellsLoading, isFetching: isBellsFetching } = useBells(tabId)
   const { mutate: addBell } = useAddBell(tabId)
@@ -44,6 +44,8 @@ const BellTab = (): JSX.Element => {
     const initializeQueue = async (): Promise<void> => {
       if (bells) {
         // Populate the queue with fetched data
+        console.log(bells)
+
         await clearQueue()
         await addToQueue(bells.data)
         await processNextBell() // Ensure queue processing is completed before moving on
@@ -95,16 +97,11 @@ const BellTab = (): JSX.Element => {
           <Add sx={{ mr: 1 }} /> New Bell
         </Fab>
 
-        {/* <AlarmDialog
-          open={open}
-          handleClose={handleClose}
-          onTimeAdd={handleTimeAdd}
-          activeTab={tabId}
-        /> */}
         <AlarmDialogV2
           open={openV2}
-          activeTab={tabId}
+          activeTab={tabId || ''}
           title="Create New Bell"
+          timeLength={bells.data.length}
           handleClose={handleClose}
           onTimeAdd={handleTimeAdd}
         />
@@ -119,7 +116,7 @@ const BellTab = (): JSX.Element => {
               : undefined
           }
         >
-          <MenuItem onClick={handleTimeDelete}>
+          <MenuItem onClick={handleTimeDelete} sx={{ color: 'red' }}>
             <DeleteOutlined sx={{ mr: 1 }} /> Delete
           </MenuItem>
         </Menu>

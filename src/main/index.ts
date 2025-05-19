@@ -154,13 +154,7 @@ app.whenReady().then(() => {
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Path for path.resolve: ${extractedPathFromUrl}`)
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Decoded and Resolved File Path: ${decodedFilePath}`)
 
-    // ... (rest of your logging and security checks remain the same)
     const userMusicDir = app.getPath('music')
-    // const projectMusicDirPath = ... (ensure it's defined)
-    // Make sure projectMusicDirPath is defined in this scope for the comparison
-    // Example: import { projectMusicDirPath as sharedProjectMusicDirPath } from '@shared/constant';
-    // const projectMusicDirPath = sharedProjectMusicDirPath;
-    // OR const projectMusicDirPath = join(app.getPath('music'), 'BellSystem');
 
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] User Music Dir: ${userMusicDir}`)
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Project Music Dir Path: ${projectMusicDirPath}`)

@@ -1,5 +1,10 @@
 import { NotificationsOffRounded } from '@mui/icons-material'
 import { Container, Typography } from '@mui/material'
+// import { FC } from 'react'
+
+// interface NoBellsProps {
+//   tabName: string
+// }
 
 const NoBells = (): JSX.Element => {
   return (

@@ -1,4 +1,4 @@
-import { AudioFile, Tab, TimeData } from '@shared/type'
+import { AudioFile, Tab, TabWithOutTimeData, TimeData } from '@shared/type'
 
 export const setActiveTab = async (
   activeTabId: string,
@@ -18,7 +18,7 @@ export const renameAudioFile = async (
   return await window.electron.ipcRenderer.invoke('renameAudioFile', oldFileName, newFileName)
 }
 
-export const fetchTabs = async (): Promise<Tab[]> => {
+export const fetchTabs = async (): Promise<TabWithOutTimeData[]> => {
   // const fetchedTabs: Tab[] = await window.electron.ipcRenderer.invoke('getTabs')
   return await window.electron.ipcRenderer.invoke('getAllTabWithOutTimeData')
 }

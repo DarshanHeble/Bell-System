@@ -74,7 +74,7 @@ const NameDialog: FC<NameDialogProps> = ({ open, title, text, label, onClose, on
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" color="success">
+          <Button type="submit" color="success" disabled={!name.trim() || name.trim() === text}>
             Submit
           </Button>
         </DialogActions>
