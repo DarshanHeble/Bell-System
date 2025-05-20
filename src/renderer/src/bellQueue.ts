@@ -1,7 +1,6 @@
-import { Time, TimeData } from '@shared/type'
+import { Time, TimeData } from '@shared/type' // Assuming Day is also in @shared/type
 import FastPriorityQueue from 'fastpriorityqueue'
 import { playAudio } from './utils/playAudio'
-import { getCurrent24HourTime, getCurrentDayName } from '@shared/utils'
 
 export const bellQueue = new FastPriorityQueue<TimeData>((a, b) => {
   const convertTo24Hour = (time: Time): number =>
@@ -13,7 +12,7 @@ export const bellQueue = new FastPriorityQueue<TimeData>((a, b) => {
 // Function to add data to the queue
 export async function addToQueue(data: TimeData[]): Promise<void> {
   data.forEach((item) => {
-    // if (item.switch_state) {
+    // if (item.switch_state) { // You might want to keep this check or remove if processNextBell handles all inactive cases
     bellQueue.add(item)
     // } else {
     //   console.log('Skipping the in-active time', item.label)
@@ -26,6 +25,21 @@ export async function clearQueue(): Promise<void> {
     bellQueue.poll() // Remove the top element until the queue is empty
   }
   console.log('Bell queue cleared.')
+}
+
+// Utility to get the current time in 24-hour format for comparison
+function getCurrent24HourTime(): number {
+  const now = new Date()
+  const hour = now.getHours() // 0-23
+  const minute = now.getMinutes()
+  return hour + minute / 60
+}
+
+// Utility to get the current day name (e.g., "Sunday", "Monday")
+function getCurrentDayName(): string {
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const now = new Date()
+  return daysOfWeek[now.getDay()]
 }
 
 let isProcessing = false // Flag to prevent duplicate processing
@@ -50,9 +64,9 @@ export async function processNextBell(): Promise<void> {
 
       if (!nextBell) break
 
-      // Skip inactive items
+      // Skip inactive items based on switch_state
       if (!nextBell.switch_state) {
-        console.log(`Skipping inactive bell: ${nextBell.label}`)
+        console.log(`Skipping inactive bell (switch_state is false): ${nextBell.label}`)
         bellQueue.poll() // Remove the inactive item
         continue
       }
@@ -76,12 +90,12 @@ export async function processNextBell(): Promise<void> {
         // Time has passed; discard this item
         bellQueue.poll()
         console.log(
-          `Skipped: ${nextBell.time.hour}:${nextBell.time.minute} ${nextBell.time.period} (time already passed)`
+          `Skipped: ${nextBell.label} - ${nextBell.time.hour}:${nextBell.time.minute} ${nextBell.time.period} (time already passed)`
         )
       } else {
         // Time is valid; process this item
         console.log(`Processing: ${nextBell.label}`)
-        bellQueue.poll()
+        bellQueue.poll() // Remove it now that we are scheduling it
 
         // Simulate setting up for the next task (e.g., scheduling an alarm)
         setTimeout(
@@ -90,15 +104,30 @@ export async function processNextBell(): Promise<void> {
               `Executing: ${nextBell.label} at ${nextBell.time.hour}:${nextBell.time.minute} ${nextBell.time.period}`
             )
             playAudio(nextBell.music_file_name)
-            await processNextBell() // Process the next item
+            // After execution, immediately try to process the next bell from the queue
+            // This ensures that if multiple bells were scheduled for very close times,
+            // or if a new bell is added while waiting, it gets processed.
+            // We set isProcessing to false before calling processNextBell again
+            // to allow the next call to proceed.
+            isProcessing = false // Allow next call to proceed
+            await processNextBell()
           },
           (nextTime24Hour - getCurrent24HourTime()) * 60 * 60 * 1000
         )
 
-        break // Exit the loop after scheduling
+        // Important: Since we've scheduled an async task (setTimeout),
+        // we should NOT reset isProcessing here immediately.
+        // It will be reset either in the finally block if an error occurs
+        // or just before calling processNextBell() inside the setTimeout callback.
+        // For this structure, we want to break the loop and wait for the setTimeout.
+        return // Exit the function, as we've scheduled the next bell
       }
     }
-  } finally {
-    isProcessing = false // Reset the flag when processing is done
+
+    // If the loop finishes without scheduling anything (e.g., all items were skipped or queue became empty)
+    isProcessing = false // Reset the flag if loop finished without scheduling
+  } catch (error) {
+    console.error('Error processing bell queue:', error)
+    isProcessing = false // Ensure flag is reset on error
   }
 }

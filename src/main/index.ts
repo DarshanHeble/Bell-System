@@ -19,6 +19,7 @@ import { CUSTOM_PROTOCOL_SCHEME, projectMusicDirPath } from '@shared/constant'
 import migrateData from './utils/migrateData'
 import setupIpcHandlers from './setupIpcHandlers'
 import { pathToFileURL } from 'url'
+import { setMainWindow } from './scheduler/bellScheduler'
 
 // set app name
 app.setName('Bell System')
@@ -84,7 +85,6 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-      // webSecurity: false
     }
   })
 
@@ -96,6 +96,9 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  // set the mainWindow instance to the bell scheduler
+  setMainWindow(mainWindow)
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
@@ -134,7 +137,7 @@ app.whenReady().then(() => {
   // Handle requests for the custom protocol
   // This replaces protocol.registerFileProtocol
   ses.protocol.handle(CUSTOM_PROTOCOL_SCHEME, async (request) => {
-    let extractedPathFromUrl = request.url.substring(CUSTOM_PROTOCOL_SCHEME.length + 3) // e.g., "c/Users/..." or "C:/Users/..."
+    let extractedPathFromUrl = request.url.substring(CUSTOM_PROTOCOL_SCHEME.length + 3)
 
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Original Request URL: ${request.url}`)
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Extracted path from URL: ${extractedPathFromUrl}`)
