@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Box,
   Button,
@@ -24,42 +25,38 @@ import {
   UploadFileOutlined
 } from '@mui/icons-material'
 
-import { useEffect, useState } from 'react'
-import { Toaster } from 'sonner'
+import { toast, Toaster } from 'sonner'
 import ConfirmationDialog from '../components/dialogs/ConfirmationDialog'
 import { deleteAudioFile, renameAudioFile } from '@renderer/api'
 import NameDialog from '../components/dialogs/NameDialog'
 import { AudioFile } from '@shared/type'
-// import handBell from '@renderer/assets/Handbell.mp3'
+import { useAudio } from '@renderer/hooks/audio'
 
 function ManageAudioFiles(): JSX.Element {
   const [helpOpen, setHelpOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
-  const [musicFiles, setMusicFiles] = useState<AudioFile[]>([])
+  // const [musicFiles, setMusicFiles] = useState<AudioFile[]>([])
   const [selectedFile, setSelectedFile] = useState<AudioFile | null>(null)
 
-  useEffect(() => {
-    const getMusicFiles = async (): Promise<void> => {
-      const result: AudioFile[] = await window.electron.ipcRenderer.invoke('get-music-files')
-      setMusicFiles(result)
-      console.log(result)
-    }
-    getMusicFiles()
-  }, [])
+  const { data: musicFiles, refetch: refetchMusicFiles } = useAudio()
 
   const handleSelectFile = async (): Promise<void> => {
-    const fileName = await window.electron.ipcRenderer.invoke('createAudioFile')
-    // if (filePath == null) {
-    //   toast.error('something went wrong')
-    // }
-    setMusicFiles((prev) => [...prev, fileName])
+    await window.electron.ipcRenderer
+      .invoke('select-music-file')
+      .then(() => {
+        toast.success('Audio Added')
+        refetchMusicFiles()
+      })
+      .catch((error) => {
+        toast.error(error.message || 'Something went wrong')
+      })
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      <Toaster richColors />
+      <Toaster richColors theme="dark" />
       <Toolbar sx={{ backgroundColor: '#202020' }}>
         {/* <Tooltip title="Go back">
           <IconButton size="large" onClick={() => navigate('/')}>
@@ -79,7 +76,7 @@ function ManageAudioFiles(): JSX.Element {
       </Toolbar>
       <Container sx={{ padding: 2 }}>
         <List>
-          {musicFiles.map((file, index) => (
+          {musicFiles?.map((file, index) => (
             <Box key={index}>
               <ListItem>
                 <ListItemIcon>
@@ -151,7 +148,8 @@ function ManageAudioFiles(): JSX.Element {
         onConfirm={async () => {
           if (!selectedFile) return
           await deleteAudioFile(selectedFile.name)
-          setMusicFiles((prev) => prev.filter((file) => file !== selectedFile))
+          // setMusicFiles((prev) => prev.filter((file) => file !== selectedFile))
+          refetchMusicFiles()
           setConfirmationOpen(false)
         }}
       />

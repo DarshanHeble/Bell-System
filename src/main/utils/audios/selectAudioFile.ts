@@ -1,6 +1,6 @@
 import { projectMusicDirPath } from '@shared/constant'
 import { dialog } from 'electron'
-import { copyFileSync, mkdirSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 
 const selectAudioFile = async (): Promise<string | null> => {
@@ -11,23 +11,29 @@ const selectAudioFile = async (): Promise<string | null> => {
     })
 
     if (result.canceled) {
-      return null
-    } else {
-      const filePath = result.filePaths[0]
-      const fileName = path.basename(filePath)
-      const destinationPath = path.join(projectMusicDirPath, path.basename(filePath))
-
-      // Ensure the music directory exists
-      mkdirSync(projectMusicDirPath, { recursive: true })
-
-      // Copy the file
-      copyFileSync(filePath, destinationPath)
-
-      return fileName
+      console.warn('User cancelled the file selection operation.')
+      return null // Return null instead of throwing an error
     }
+
+    const filePath = result.filePaths[0]
+    const fileName = path.basename(filePath)
+    const destinationPath = path.join(projectMusicDirPath, fileName)
+
+    // Ensure the music directory exists
+    mkdirSync(projectMusicDirPath, { recursive: true })
+
+    // Check if the file already exists
+    if (existsSync(destinationPath)) {
+      console.warn(`File "${fileName}" already exists. Skipping copy.`)
+      return null // Indicate no file was copied due to duplication
+    }
+
+    // Copy the file
+    copyFileSync(filePath, destinationPath)
+    return fileName
   } catch (error) {
-    console.error('Error selecting and copying music file:', error)
-    return null
+    console.error('Unexpected error while selecting or copying the music file:', error)
+    throw new Error('Failed to select or copy the audio file. Please try again.')
   }
 }
 
