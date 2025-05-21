@@ -1,4 +1,5 @@
-import { addTime, deleteTime, getTab } from '@renderer/api'
+import { getTab } from '@renderer/Apis/tab'
+import { addTime, deleteTime } from '@renderer/Apis/time'
 import { Tab, TimeData } from '@shared/type'
 import {
   useMutation,

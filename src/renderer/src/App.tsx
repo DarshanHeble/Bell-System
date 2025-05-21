@@ -6,10 +6,11 @@ import ManageAudioFiles from './pages/ManageAudioFiles'
 import Lock from './pages/lock'
 import BellTab from './pages/BellTab'
 import Sidebar from './components/Sidebar'
-import { checkUserIsVerified, fetchTabs } from './api'
+import { checkUserIsVerified } from './Apis/other'
 import { useQuery } from '@tanstack/react-query'
 import EmptyTabs from './pages/EmptyTabs'
 import { TabWithOutTimeData } from '@shared/type'
+import { fetchTabs } from './Apis/tab'
 
 function App(): JSX.Element {
   const [isVerified, setIsVerified] = useState<boolean>(false)

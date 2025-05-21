@@ -12,7 +12,7 @@ const selectAudioFile = async (): Promise<string | null> => {
 
     if (result.canceled) {
       console.warn('User cancelled the file selection operation.')
-      return null // Return null instead of throwing an error
+      return 'cancel'
     }
 
     const filePath = result.filePaths[0]
@@ -25,7 +25,7 @@ const selectAudioFile = async (): Promise<string | null> => {
     // Check if the file already exists
     if (existsSync(destinationPath)) {
       console.warn(`File "${fileName}" already exists. Skipping copy.`)
-      return null // Indicate no file was copied due to duplication
+      return 'duplicate'
     }
 
     // Copy the file

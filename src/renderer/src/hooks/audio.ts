@@ -1,4 +1,4 @@
-import { getMusicFiles } from '@renderer/api'
+import { getMusicFiles } from '@renderer/Apis/audio'
 import { AudioFile } from '@shared/type'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 

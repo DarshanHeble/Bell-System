@@ -25,9 +25,9 @@ import {
   UploadFileOutlined
 } from '@mui/icons-material'
 
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import ConfirmationDialog from '../components/dialogs/ConfirmationDialog'
-import { deleteAudioFile, renameAudioFile } from '@renderer/api'
+import { deleteAudioFile, renameAudioFile } from '@renderer/Apis/audio'
 import NameDialog from '../components/dialogs/NameDialog'
 import { AudioFile } from '@shared/type'
 import { useAudio } from '@renderer/hooks/audio'
@@ -45,9 +45,11 @@ function ManageAudioFiles(): JSX.Element {
   const handleSelectFile = async (): Promise<void> => {
     await window.electron.ipcRenderer
       .invoke('select-music-file')
-      .then(() => {
-        toast.success('Audio Added')
+      .then((fileName: string) => {
         refetchMusicFiles()
+        if (fileName == 'cancel') toast.info('User Cancelled the Operation')
+        else if (fileName == 'duplicate') toast.info('File with Name Already Exists ')
+        else toast.success('Audio Added Successfully')
       })
       .catch((error) => {
         toast.error(error.message || 'Something went wrong')
@@ -56,7 +58,6 @@ function ManageAudioFiles(): JSX.Element {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      <Toaster richColors theme="dark" />
       <Toolbar sx={{ backgroundColor: '#202020' }}>
         {/* <Tooltip title="Go back">
           <IconButton size="large" onClick={() => navigate('/')}>
@@ -127,6 +128,7 @@ function ManageAudioFiles(): JSX.Element {
           Upload File
         </Fab>
       </Container>
+
       <Dialog open={helpOpen} onClose={() => setHelpOpen(false)}>
         <DialogTitle>Info</DialogTitle>
         <DialogContent>
@@ -140,10 +142,11 @@ function ManageAudioFiles(): JSX.Element {
           <Button onClick={() => setHelpOpen(false)}>Ok</Button>
         </DialogActions>
       </Dialog>
+
       <ConfirmationDialog
         open={confirmationOpen}
         title="Delete file?"
-        message={`Are you sure you want to delete this ${selectedFile} file. This action cannot be undone.`}
+        message={`Are you sure you want to delete this ${selectedFile?.name} file. This action cannot be undone.`}
         onClose={() => setConfirmationOpen(false)}
         onConfirm={async () => {
           if (!selectedFile) return
@@ -153,6 +156,7 @@ function ManageAudioFiles(): JSX.Element {
           setConfirmationOpen(false)
         }}
       />
+
       <NameDialog
         open={nameDialogOpen}
         title="Rename this file"

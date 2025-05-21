@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import { Alarm, MoreVert, EditOutlined, DeleteOutlined } from '@mui/icons-material'
 import { TabWithOutTimeData } from '@shared/type'
-import { updateActiveTab } from '@renderer/api'
+import { updateActiveTab } from '@renderer/Apis/tab'
 import { useNavigate } from 'react-router-dom'
 import NameDialog from '../dialogs/NameDialog'
 

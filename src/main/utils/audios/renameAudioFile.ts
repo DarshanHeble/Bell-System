@@ -8,14 +8,15 @@ async function renameAudioFile(oldFileName: string, newFileName: string): Promis
     const newFilePath = path.join(projectMusicDirPath, newFileName)
 
     rename(oldFilePath, newFilePath, (err) => {
-      if (err) return false
+      if (err) throw err
+
       return true
     })
 
     return true
   } catch (error) {
     console.error(error)
-    return false
+    throw error
   }
 }
 
