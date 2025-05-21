@@ -1,6 +1,7 @@
 import { Time, TimeData } from '@shared/type' // Assuming Day is also in @shared/type
 import FastPriorityQueue from 'fastpriorityqueue'
 import { playAudio } from './utils/playAudio'
+import { getCurrent24HourTime, getCurrentDayName } from '@shared/utils'
 
 export const bellQueue = new FastPriorityQueue<TimeData>((a, b) => {
   const convertTo24Hour = (time: Time): number =>
@@ -25,21 +26,6 @@ export async function clearQueue(): Promise<void> {
     bellQueue.poll() // Remove the top element until the queue is empty
   }
   console.log('Bell queue cleared.')
-}
-
-// Utility to get the current time in 24-hour format for comparison
-function getCurrent24HourTime(): number {
-  const now = new Date()
-  const hour = now.getHours() // 0-23
-  const minute = now.getMinutes()
-  return hour + minute / 60
-}
-
-// Utility to get the current day name (e.g., "Sunday", "Monday")
-function getCurrentDayName(): string {
-  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  const now = new Date()
-  return daysOfWeek[now.getDay()]
 }
 
 let isProcessing = false // Flag to prevent duplicate processing

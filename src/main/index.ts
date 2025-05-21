@@ -7,7 +7,8 @@ import {
   powerMonitor,
   protocol,
   net,
-  session
+  session,
+  globalShortcut
 } from 'electron'
 import { join, resolve } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -19,7 +20,8 @@ import { CUSTOM_PROTOCOL_SCHEME, projectMusicDirPath } from '@shared/constant'
 import migrateData from './utils/migrateData'
 import setupIpcHandlers from './setupIpcHandlers'
 import { pathToFileURL } from 'url'
-import { setMainWindow } from './scheduler/bellScheduler'
+import { setSchedulerMainWindow } from './scheduler/bellScheduler'
+import { registerZoomShortcuts, unregisterZoomShortcuts } from './events'
 
 // set app name
 app.setName('Bell System')
@@ -47,33 +49,6 @@ protocol.registerSchemesAsPrivileged([
   }
 ])
 
-app.on('ready', () => {
-  // Prevent display sleep
-  powerMonitor.on('lock-screen', () => {
-    powerSaveBlocker.start('prevent-display-sleep')
-  })
-
-  // Prevent app suspension
-  powerMonitor.on('suspend', () => {
-    powerSaveBlocker.start('prevent-app-suspension')
-  })
-})
-
-// function getMimeType(extension): string {
-//   switch (extension.toLowerCase()) {
-//     case '.mp3':
-//       return 'audio/mpeg'
-//     case '.ogg':
-//       return 'audio/ogg'
-//     case '.wav':
-//       return 'audio/wav'
-//     case '.aac':
-//       return 'audio/aac'
-//     default:
-//       return 'application/octet-stream' // Default binary type
-//   }
-// }
-
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -97,9 +72,6 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // set the mainWindow instance to the bell scheduler
-  setMainWindow(mainWindow)
-
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -107,6 +79,38 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  // set the mainWindow instance to the bell scheduler
+  setSchedulerMainWindow(mainWindow)
+
+  app.whenReady().then(() => {
+    // Prevent display sleep
+    powerMonitor.on('lock-screen', () => {
+      console.log('prevent-display-sleep')
+      powerSaveBlocker.start('prevent-display-sleep')
+    })
+
+    // Prevent app suspension
+    powerMonitor.on('suspend', () => {
+      console.log('prevent-app-suspension')
+      powerSaveBlocker.start('prevent-app-suspension')
+    })
+
+    // Register shortcuts when the window gains focus
+    mainWindow.on('focus', () => {
+      registerZoomShortcuts(mainWindow)
+    })
+
+    // Unregister shortcuts when the window loses focus
+    mainWindow.on('blur', () => {
+      unregisterZoomShortcuts()
+    })
+
+    // Initial registration if the window starts focused (usually true)
+    if (mainWindow.isFocused()) {
+      registerZoomShortcuts(mainWindow)
+    }
+  })
 }
 
 // This method will be called when Electron has finished
@@ -135,14 +139,12 @@ app.whenReady().then(() => {
   const ses = session.defaultSession
 
   // Handle requests for the custom protocol
-  // This replaces protocol.registerFileProtocol
   ses.protocol.handle(CUSTOM_PROTOCOL_SCHEME, async (request) => {
     let extractedPathFromUrl = request.url.substring(CUSTOM_PROTOCOL_SCHEME.length + 3)
 
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Original Request URL: ${request.url}`)
     console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Extracted path from URL: ${extractedPathFromUrl}`)
 
-    // --- CRITICAL CHANGE HERE ---
     // If the path starts with a drive letter (e.g., "c/" or "C/"), re-format it to "C:/"
     // to ensure path.resolve treats it as an absolute path from that drive.
     if (/^[a-zA-Z]\//.test(extractedPathFromUrl)) {
@@ -150,7 +152,6 @@ app.whenReady().then(() => {
       extractedPathFromUrl =
         extractedPathFromUrl.charAt(0) + ':' + extractedPathFromUrl.substring(1) // "c/" -> "c:/"
     }
-    // Now extractedPathFromUrl should be like "c:/Users/..." or "C:/Users/..."
 
     const decodedFilePath = resolve(decodeURIComponent(extractedPathFromUrl))
 
@@ -207,6 +208,10 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+})
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

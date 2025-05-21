@@ -12,6 +12,8 @@
     "dirents",
     "fastpriorityqueue",
     "Hoverable",
+    "numadd",
+    "numsub",
     "Sidebaranchor"
   ]
 }

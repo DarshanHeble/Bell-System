@@ -18,6 +18,14 @@ import {
   updateSwitch,
   userVerified
 } from './utils'
+import {
+  addScheduledItem,
+  deleteScheduledItem,
+  getCurrentlyScheduledBellInfo,
+  startScheduler,
+  stopScheduler,
+  updateScheduledItem
+} from './scheduler/bellScheduler'
 
 const setupIpcHandlers = async (): Promise<void> => {
   // Tab management
@@ -25,12 +33,10 @@ const setupIpcHandlers = async (): Promise<void> => {
   ipcMain.handle('getTab', (_, tabId: string) => getTab(tabId))
   ipcMain.handle('addTab', (_, tabData: Tab) => addTab(tabData))
   ipcMain.handle('deleteTab', (_, _id: string) => deleteTab(_id))
-  ipcMain.handle('renameTab', (_, _id: string, newTabName: string) => {
-    renameTab(_id, newTabName)
-  })
-  ipcMain.handle('setActiveTab', (_, activeTabId: string, inActiveTabId: string) => {
+  ipcMain.handle('renameTab', (_, _id: string, newTabName: string) => renameTab(_id, newTabName))
+  ipcMain.handle('setActiveTab', (_, activeTabId: string, inActiveTabId: string) =>
     setActiveTab(activeTabId, inActiveTabId)
-  })
+  )
   ipcMain.handle('getAllTabWithOutTimeData', () => getAllTabsWithoutTimeData())
 
   // Time data management
@@ -43,9 +49,8 @@ const setupIpcHandlers = async (): Promise<void> => {
   // Audio management
   ipcMain.handle(
     'playAudio',
-    async (_, audioFileName: string, tab_name: string, timeData: TimeData) => {
+    async (_, audioFileName: string, tab_name: string, timeData: TimeData) =>
       await playAudio(audioFileName, tab_name, timeData)
-    }
   )
   ipcMain.handle('select-music-file', async () => await selectAudioFile())
   ipcMain.handle('get-music-files', async () => await getMusicFiles())
@@ -59,6 +64,26 @@ const setupIpcHandlers = async (): Promise<void> => {
   // User verification
   ipcMain.handle('userIsVerified', () => userVerified())
   ipcMain.handle('checkUserIsVerified', () => checkUserVerified())
+
+  // Bell Scheduler
+  ipcMain.handle(
+    'scheduler:start',
+    async (_, timeData: TimeData[]) => await startScheduler(timeData)
+  )
+  ipcMain.handle('scheduler:stop', async () => await stopScheduler())
+  ipcMain.handle(
+    'scheduler:add-item',
+    async (_, timeData: TimeData) => await addScheduledItem(timeData)
+  )
+  ipcMain.handle(
+    'scheduler:delete-item',
+    async (_, timeId: string) => await deleteScheduledItem(timeId)
+  )
+  ipcMain.handle(
+    'scheduler:update-item',
+    async (_, timeData: TimeData) => await updateScheduledItem(timeData)
+  )
+  ipcMain.handle('scheduler:get-info', () => getCurrentlyScheduledBellInfo())
 }
 
 export default setupIpcHandlers

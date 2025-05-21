@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Card, CardActionArea, CardContent, Typography, Switch } from '@mui/material'
 import { TimeData } from '@shared/type'
-import { processNextBell } from '@renderer/bellQueue'
 import { daysOfWeek } from '@renderer/constants'
+import { updateScheduledItem } from '@renderer/Apis/scheduler'
 
 interface AlarmCardProps {
   data: TimeData
@@ -13,6 +13,15 @@ interface AlarmCardProps {
 const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) => {
   // const theme = useTheme()
   const [isChecked, setIsChecked] = useState<boolean>(data.switch_state)
+  const [isScheduled, setIsScheduled] = useState(false)
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('schedule-updated', (_, response: TimeData | null) => {
+      if (response && data.id === response.id) {
+        setIsScheduled(true)
+      }
+    })
+  }, [])
 
   const handleContextMenu = (event: React.MouseEvent): void => {
     event.preventDefault()
@@ -30,7 +39,10 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
       await window.electron.ipcRenderer.invoke('updateSwitch', tab_id, data.id, newValue)
 
       // Reprocess the bell queue to account for the updated switch state
-      await processNextBell()
+      await updateScheduledItem({
+        ...data,
+        switch_state: newValue
+      })
     } catch (error) {
       console.error('Error updating switch state:', error)
 
@@ -43,7 +55,9 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
     <Card
       sx={{
         position: 'relative',
-        height: 'max-content'
+        height: 'max-content',
+        border: '1px solid transparent',
+        borderColor: isScheduled ? 'primary.main' : 'transparent'
       }}
     >
       <CardActionArea

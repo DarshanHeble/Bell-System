@@ -33,3 +33,18 @@ export function getCurrentDayName(): string {
   const now = new Date()
   return daysOfWeek[now.getDay()] // getDay() returns 0 for Sunday, 1 for Monday, etc.
 }
+
+export function getMimeType(extension: string): string {
+  switch (extension.toLowerCase()) {
+    case '.mp3':
+      return 'audio/mpeg'
+    case '.ogg':
+      return 'audio/ogg'
+    case '.wav':
+      return 'audio/wav'
+    case '.aac':
+      return 'audio/aac'
+    default:
+      return 'application/octet-stream' // Default binary type
+  }
+}

@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react'
 import { Add, DeleteOutlined } from '@mui/icons-material'
 // import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
 import { useAddBell, useBells, useDeleteBell } from '@renderer/hooks/bells'
-import { addToQueue, bellQueue, clearQueue, processNextBell } from '@renderer/bellQueue'
 import AlarmDialogV2 from '@renderer/components/dialogs/AlarmDialogV2'
+import { addScheduledItem, deleteScheduledItem, startScheduler } from '@renderer/Apis/scheduler'
 
 const BellTab = (): JSX.Element => {
   const { tabId } = useParams<{ tabId: string }>()
@@ -43,12 +43,9 @@ const BellTab = (): JSX.Element => {
   useEffect(() => {
     const initializeQueue = async (): Promise<void> => {
       if (bells) {
-        // Populate the queue with fetched data
         console.log(bells)
-
-        await clearQueue()
-        await addToQueue(bells.data)
-        await processNextBell() // Ensure queue processing is completed before moving on
+        // Start the bell scheduler
+        await startScheduler(bells.data)
       }
     }
 
@@ -58,16 +55,16 @@ const BellTab = (): JSX.Element => {
   async function handleTimeAdd(tabId: string, newTimeData: TimeData): Promise<void> {
     if (!tabId) return
     addBell(newTimeData)
-    bellQueue.add(newTimeData)
-    await processNextBell()
+    await addScheduledItem(newTimeData)
   }
 
   async function handleTimeDelete(): Promise<void> {
     if (cardContextMenu) {
       deleteBell(cardContextMenu.data)
       setCardContextMenu(null)
-      bellQueue.remove(cardContextMenu.data)
-      await processNextBell()
+      if (cardContextMenu.data.id) {
+        await deleteScheduledItem(cardContextMenu.data.id)
+      }
     }
   }
 
