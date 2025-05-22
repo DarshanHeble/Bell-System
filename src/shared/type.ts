@@ -23,7 +23,7 @@ export type Tab = {
   _rev?: string
   tab_name: string
   isActive?: boolean
-  tab_id: string
+  tab_id: string // This is not used anyone, just kept to be safe
   data: TimeData[]
 }
 

@@ -8,6 +8,10 @@ let currentlyScheduledBell: TimeData | null = null
 let executionTimerId: NodeJS.Timeout | null = null
 let isProcessing = false
 
+// --- Variables to store active tab info ---
+let currentScheduledTabId: string | null = null
+let currentScheduledTabName: string | null = null
+
 // --- Internal Helper Functions ---
 function clearExistingTimerAndScheduledBellState(): void {
   if (executionTimerId) {
@@ -50,6 +54,8 @@ async function internalClearQueue(): Promise<void> {
     bellQueue.poll()
   }
   activeItemRegistry.clear() // Clear the registry too
+  currentScheduledTabId = null
+  currentScheduledTabName = null
 }
 
 async function internalProcessNextBell(): Promise<void> {
@@ -218,6 +224,16 @@ export function getCurrentlyScheduledBellInfo(): TimeData | null {
   return currentlyScheduledBell
 }
 
+export function getCurrentlyScheduledTabInfo(): {
+  tabId: string | null
+  tabName: string | null
+} | null {
+  return {
+    tabId: currentScheduledTabId,
+    tabName: currentScheduledTabName
+  }
+}
+
 async function repopulateQueueFromRegistry(): Promise<void> {
   while (!bellQueue.isEmpty()) {
     bellQueue.poll()
@@ -233,10 +249,18 @@ async function repopulateQueueFromRegistry(): Promise<void> {
   console.log('Re Populated queue from registry')
 }
 
-export async function startScheduler(timeData: TimeData[]): Promise<void> {
+export async function startScheduler(
+  timeData: TimeData[],
+  tabId: string,
+  tabName: string
+): Promise<void> {
   console.log('Backend: Starting scheduler with new data.')
   clearExistingTimerAndScheduledBellState()
   await internalClearQueue() // Clears bellQueue (by polling) and activeItemRegistry
+
+  // --- Store the current tab info ---
+  currentScheduledTabId = tabId
+  currentScheduledTabName = tabName
 
   timeData.forEach((item) => {
     // Populate registry first

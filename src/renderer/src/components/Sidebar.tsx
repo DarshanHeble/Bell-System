@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { Tab, TabWithOut_Id, TabWithOutTimeData } from '@shared/type'
 import NameDialog from './dialogs/NameDialog'
 import TabList from './smallComponents/TabList'
+import { stopScheduler } from '@renderer/Apis/scheduler'
 
 interface SidebarProps {
   tabs: TabWithOutTimeData[]
@@ -64,6 +65,7 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
         } else {
           setActiveTab('')
           navigate('tabs/none') // Navigate to a fallback route when no tabs remain
+          stopScheduler() // Stop the scheduler if no tabs are available
         }
       }
 

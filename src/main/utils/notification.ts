@@ -9,7 +9,7 @@ export const notification = {
     new Notification({
       title: 'Bell System',
       subtitle: label,
-      body: `Successfully Played Bell On: ${time.hour}: ${time.minute.toString().padStart(2, '0')} ${time.period}`,
+      body: `Successfully Played Bell On: ${time.hour}:${time.minute.toString().padStart(2, '0')} ${time.period}`,
       icon: path.join(__dirname, '../../resources/icon.png')
     }).show()
   },
@@ -20,7 +20,7 @@ export const notification = {
     new Notification({
       title: 'Bell System',
       subtitle: label,
-      body: `Failed to Play Bell On: ${time.hour}: ${time.minute.toString().padStart(2, '0')} ${time.period}`,
+      body: `Failed to Play Bell On: ${time.hour}:${time.minute.toString().padStart(2, '0')} ${time.period}`,
       icon: path.join(__dirname, '../../resources/icon.png')
     }).show()
   }
