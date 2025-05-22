@@ -227,7 +227,7 @@ export function getCurrentlyScheduledBellInfo(): TimeData | null {
 export function getCurrentlyScheduledTabInfo(): {
   tabId: string | null
   tabName: string | null
-} | null {
+} {
   return {
     tabId: currentScheduledTabId,
     tabName: currentScheduledTabName
