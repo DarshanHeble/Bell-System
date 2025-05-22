@@ -45,7 +45,7 @@ const BellTab = (): JSX.Element => {
       if (bells) {
         console.log(bells)
         // Start the bell scheduler
-        await startScheduler(bells.data)
+        await startScheduler(bells.data, bells._id, bells.tab_name)
       }
     }
 

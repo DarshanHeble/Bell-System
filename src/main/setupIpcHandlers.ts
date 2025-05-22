@@ -69,7 +69,8 @@ const setupIpcHandlers = async (): Promise<void> => {
   // Bell Scheduler
   ipcMain.handle(
     'scheduler:start',
-    async (_, timeData: TimeData[]) => await startScheduler(timeData)
+    async (_, timeData: TimeData[], tabId: string, tabName: string) =>
+      await startScheduler(timeData, tabId, tabName)
   )
   ipcMain.handle('scheduler:stop', async () => await stopScheduler())
   ipcMain.handle(

@@ -1,7 +1,11 @@
 import { TimeData } from '@shared/type'
 
-export async function startScheduler(timeData: TimeData[]): Promise<void> {
-  return await window.electron.ipcRenderer.invoke('scheduler:start', timeData)
+export async function startScheduler(
+  timeData: TimeData[],
+  tabId: string,
+  tabName: string
+): Promise<void> {
+  return await window.electron.ipcRenderer.invoke('scheduler:start', timeData, tabId, tabName)
 }
 
 export async function addScheduledItem(timeData: TimeData): Promise<void> {
