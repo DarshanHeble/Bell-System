@@ -58,6 +58,7 @@ export default function Lock({ setVerified }: LockProps): JSX.Element {
             error={error}
             helperText={error ? 'Incorrect password. Please try again.' : ''}
             margin="normal"
+            autoFocus
           />
 
           <Button

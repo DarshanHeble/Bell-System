@@ -24,16 +24,24 @@ function App(): JSX.Element {
     queryKey: ['init'],
     queryFn: async () => {
       const [isUserVerified, fetchedTabs] = await Promise.all([checkUserIsVerified(), fetchTabs()])
-      setTabs(fetchedTabs)
-      setActiveTab(fetchedTabs[0]._id)
+
+      // setTabs(fetchedTabs)
+      // setActiveTab(fetchedTabs[0]._id || '')
+      console.log(isUserVerified)
+      console.log(fetchedTabs)
 
       return { isUserVerified, fetchedTabs }
     }
   })
 
+  // console.log(initData)
+
   // Update state when data changes
   useEffect(() => {
-    if (initData?.isUserVerified) {
+    if (initData) {
+      console.log('hi')
+      setTabs(initData.fetchedTabs)
+      setActiveTab(initData.fetchedTabs[0]?._id || '')
       setIsVerified(initData.isUserVerified)
       setIsDataReady(true)
     }
@@ -47,6 +55,8 @@ function App(): JSX.Element {
 
     window.electron.ipcRenderer.on('play-audio', handlePlayAudio)
   }, [])
+
+  // console.log(isLoading, isDataReady)
 
   // Memoize the active tab calculation
   const { defaultRoute } = useMemo(() => {
