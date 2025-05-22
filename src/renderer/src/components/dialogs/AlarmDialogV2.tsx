@@ -91,6 +91,15 @@ const AlarmDialogV2: FC<AlarmDialogV2Props> = ({
     }
   }, [open, allMusic, selectedSound])
 
+  useEffect(() => {
+    const currTime = getCurrentTime()
+    setTime({
+      hour: currTime.hour.toString().padStart(2, '0'),
+      minute: currTime.minute.toString().padStart(2, '0'),
+      period: currTime.period
+    })
+  }, [])
+
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     type: 'hour' | 'minute'

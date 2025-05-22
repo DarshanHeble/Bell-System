@@ -19,6 +19,8 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
     window.electron.ipcRenderer.on('schedule-updated', (_, response: TimeData | null) => {
       if (response && data.id === response.id) {
         setIsScheduled(true)
+      } else {
+        setIsScheduled(false)
       }
     })
   }, [])
@@ -96,7 +98,7 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
             <Typography color={!isChecked ? 'textDisabled' : 'textPrimary'}>
               {data.music_file_name}
             </Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 3 }}>
               {data.days.map((day, index) => (
                 <Typography
                   key={index}

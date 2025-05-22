@@ -115,13 +115,17 @@ async function internalProcessNextBell(): Promise<void> {
       } else {
         currentlyScheduledBell = registeredItem // Schedule the version from registry
         mainWindow.webContents.send('schedule-updated', currentlyScheduledBell)
+
         const delay = (nextTime24Hour - currentTime24) * 60 * 60 * 1000
+        console.log(
+          `Backend: Scheduling: ${currentlyScheduledBell.label} to run in ${delay / 1000} seconds.`
+        )
 
         executionTimerId = setTimeout(
           async () => {
             try {
-              const itemFromQueueAtExecution = bellQueue.peek() // This is just to see what's physically at top
-              const intendedItemToExecute = activeItemRegistry.get(nextBellToConsider.id!) // Get definitive state
+              const itemFromQueueAtExecution = bellQueue.peek()
+              const intendedItemToExecute = activeItemRegistry.get(nextBellToConsider.id!)
 
               if (!intendedItemToExecute || !intendedItemToExecute.switch_state) {
                 // Item was deleted or made inactive from registry while timer was pending
@@ -152,11 +156,10 @@ async function internalProcessNextBell(): Promise<void> {
 
                   console.log(`Backend: Executing: ${intendedItemToExecute.label}`)
                   if (mainWindow) {
-                    mainWindow.webContents.send(
-                      'play-audio',
-                      intendedItemToExecute.music_file_name,
-                      intendedItemToExecute.label
-                    )
+                    mainWindow.webContents.send('play-audio', intendedItemToExecute)
+
+                    // Update the frontend that scheduled bell is no more scheduled
+                    mainWindow.webContents.send('schedule-updated', null)
                   }
                 } else {
                   // Day became inactive
@@ -227,6 +230,7 @@ async function repopulateQueueFromRegistry(): Promise<void> {
       bellQueue.add(item)
     }
   })
+  console.log('Re Populated queue from registry')
 }
 
 export async function startScheduler(timeData: TimeData[]): Promise<void> {

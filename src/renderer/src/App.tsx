@@ -9,8 +9,9 @@ import Sidebar from './components/Sidebar'
 import { checkUserIsVerified } from './Apis/other'
 import { useQuery } from '@tanstack/react-query'
 import EmptyTabs from './pages/EmptyTabs'
-import { TabWithOutTimeData } from '@shared/type'
+import { TabWithOutTimeData, TimeData } from '@shared/type'
 import { fetchTabs } from './Apis/tab'
+import { playAudio } from './utils/playAudio'
 
 function App(): JSX.Element {
   const [isVerified, setIsVerified] = useState<boolean>(false)
@@ -37,6 +38,15 @@ function App(): JSX.Element {
       setIsDataReady(true)
     }
   }, [initData])
+
+  // Handle audio play event from main process
+  useEffect(() => {
+    function handlePlayAudio(_, timeData: TimeData): void {
+      playAudio(timeData)
+    }
+
+    window.electron.ipcRenderer.on('play-audio', handlePlayAudio)
+  }, [])
 
   // Memoize the active tab calculation
   const { defaultRoute } = useMemo(() => {

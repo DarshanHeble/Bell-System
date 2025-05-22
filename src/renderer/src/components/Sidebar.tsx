@@ -141,7 +141,7 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
         open={nameDialogOpen}
         onClose={() => setNameDialogOpen(false)}
         title="Create New Tab"
-        label="Name"
+        label="Tab Name"
         onSubmit={handleAddTab}
       />
     </>

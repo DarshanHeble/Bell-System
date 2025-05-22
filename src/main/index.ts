@@ -142,8 +142,8 @@ app.whenReady().then(() => {
   ses.protocol.handle(CUSTOM_PROTOCOL_SCHEME, async (request) => {
     let extractedPathFromUrl = request.url.substring(CUSTOM_PROTOCOL_SCHEME.length + 3)
 
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Original Request URL: ${request.url}`)
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Extracted path from URL: ${extractedPathFromUrl}`)
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Original Request URL: ${request.url}`)
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Extracted path from URL: ${extractedPathFromUrl}`)
 
     // If the path starts with a drive letter (e.g., "c/" or "C/"), re-format it to "C:/"
     // to ensure path.resolve treats it as an absolute path from that drive.
@@ -155,23 +155,23 @@ app.whenReady().then(() => {
 
     const decodedFilePath = resolve(decodeURIComponent(extractedPathFromUrl))
 
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Path for path.resolve: ${extractedPathFromUrl}`)
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Decoded and Resolved File Path: ${decodedFilePath}`)
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Path for path.resolve: ${extractedPathFromUrl}`)
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Decoded and Resolved File Path: ${decodedFilePath}`)
 
     const userMusicDir = app.getPath('music')
 
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] User Music Dir: ${userMusicDir}`)
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Project Music Dir Path: ${projectMusicDirPath}`)
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] User Music Dir: ${userMusicDir}`)
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Project Music Dir Path: ${projectMusicDirPath}`)
 
     const normalizedDecodedPath = decodedFilePath.toLowerCase()
     const normalizedUserMusicDir = userMusicDir.toLowerCase()
     const normalizedProjectMusicDir = projectMusicDirPath ? projectMusicDirPath.toLowerCase() : ''
 
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Normalized Decoded Path: ${normalizedDecodedPath}`)
-    console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Normalized User Music Dir: ${normalizedUserMusicDir}`)
-    console.log(
-      `[${CUSTOM_PROTOCOL_SCHEME}] Normalized Project Music Dir: ${normalizedProjectMusicDir}`
-    )
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Normalized Decoded Path: ${normalizedDecodedPath}`)
+    // console.log(`[${CUSTOM_PROTOCOL_SCHEME}] Normalized User Music Dir: ${normalizedUserMusicDir}`)
+    // console.log(
+    //   `[${CUSTOM_PROTOCOL_SCHEME}] Normalized Project Music Dir: ${normalizedProjectMusicDir}`
+    // )
 
     if (
       !normalizedDecodedPath.startsWith(normalizedUserMusicDir) &&

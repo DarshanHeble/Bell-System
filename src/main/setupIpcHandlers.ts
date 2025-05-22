@@ -26,6 +26,7 @@ import {
   stopScheduler,
   updateScheduledItem
 } from './scheduler/bellScheduler'
+import { notification } from './utils/notification'
 
 const setupIpcHandlers = async (): Promise<void> => {
   // Tab management
@@ -84,6 +85,10 @@ const setupIpcHandlers = async (): Promise<void> => {
     async (_, timeData: TimeData) => await updateScheduledItem(timeData)
   )
   ipcMain.handle('scheduler:get-info', () => getCurrentlyScheduledBellInfo())
+
+  // Notification
+  ipcMain.handle('notification:success', (_, timeData: TimeData) => notification.success(timeData))
+  ipcMain.handle('notification:error', (_, timeData: TimeData) => notification.error(timeData))
 }
 
 export default setupIpcHandlers

@@ -58,7 +58,7 @@ function ManageAudioFiles(): JSX.Element {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      <Toolbar sx={{ backgroundColor: '#202020' }}>
+      <Toolbar>
         {/* <Tooltip title="Go back">
           <IconButton size="large" onClick={() => navigate('/')}>
             <ArrowBackOutlined />
@@ -75,6 +75,7 @@ function ManageAudioFiles(): JSX.Element {
           </Tooltip>
         </Box>
       </Toolbar>
+      <Divider />
       <Container sx={{ padding: 2 }}>
         <List>
           {musicFiles?.map((file, index) => (
