@@ -25,7 +25,8 @@ export function getCurrent24HourTime(): number {
   const now = new Date()
   const hour = now.getHours() // 0-23
   const minute = now.getMinutes()
-  return hour + minute / 60
+  const second = now.getSeconds()
+  return hour + minute / 60 + second / 3600
 }
 
 export function getCurrentDayName(): string {

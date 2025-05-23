@@ -45,7 +45,8 @@ const darkTheme = createTheme({
         root: {
           padding: 8,
           '& .MuiSwitch-track': {
-            borderRadius: 22 / 2,
+            borderRadius: '3rem',
+
             '&::before, &::after': {
               content: '""',
               position: 'absolute',
@@ -67,7 +68,8 @@ const darkTheme = createTheme({
             // boxShadow: 'none',
             width: 16,
             height: 16,
-            margin: 2
+            margin: 2,
+            backgroundColor: 'white'
           }
         }
       }
@@ -90,7 +92,7 @@ function Provider({ children }: { children: ReactNode }): JSX.Element {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={darkTheme}>
         <CssBaseline />
-        <Toaster richColors theme="dark" />
+        <Toaster richColors theme="dark" position="bottom-center" />
         {children}
       </ThemeProvider>
     </QueryClientProvider>

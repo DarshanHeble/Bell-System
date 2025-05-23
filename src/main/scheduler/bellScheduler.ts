@@ -93,15 +93,11 @@ async function internalProcessNextBell(): Promise<void> {
         continue // Try next item in queue
       }
 
-      // Ensure the item in queue reflects the latest from registry (mainly for days array if it could change)
-      // For simplicity, we assume 'days' doesn't change without a full update operation.
-      // If 'days' could change independently, you'd need to ensure the queue item uses 'registeredItem.days'.
-      // This example assumes the item in the queue is sufficiently up-to-date or will be handled by update logic.
-
       const currentDayForCheck = getCurrentDayName()
       const daySetting = registeredItem.days.find((d) => d.day === currentDayForCheck) // Use registeredItem for days
 
       if (!daySetting || !daySetting.active) {
+        console.log('Backend: Discarding item due to inactive day setting.')
         bellQueue.poll()
         continue
       }
@@ -155,10 +151,6 @@ async function internalProcessNextBell(): Promise<void> {
                   ) {
                     bellQueue.poll()
                   }
-                  // activeItemRegistry.delete(intendedItemToExecute.id!); // Assuming single-shot, remove after execution
-                  // If alarms are recurring (e.g. next day), do NOT delete from registry here.
-                  // For this example, let's assume they are single-shot for the day.
-                  // If not, the logic to re-add for next day needs to be elsewhere (e.g. after execution).
 
                   console.log(`Backend: Executing: ${intendedItemToExecute.label}`)
                   if (mainWindow) {

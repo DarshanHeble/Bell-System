@@ -5,14 +5,12 @@ import AlarmCard from '@renderer/components/smallComponents/AlarmCard'
 import { TimeData } from '@shared/type'
 import { useEffect, useState } from 'react'
 import { Add, DeleteOutlined } from '@mui/icons-material'
-// import AlarmDialog from '@renderer/components/dialogs/AlarmDialog'
 import { useAddBell, useBells, useDeleteBell } from '@renderer/hooks/bells'
 import AlarmDialogV2 from '@renderer/components/dialogs/AlarmDialogV2'
 import { addScheduledItem, deleteScheduledItem, startScheduler } from '@renderer/Apis/scheduler'
 
 const BellTab = (): JSX.Element => {
   const { tabId } = useParams<{ tabId: string }>()
-  // const [open, setOpen] = useState(false)
   const [openV2, setOpenV2] = useState(false)
 
   const handleOpen = (): void => setOpenV2(true)
@@ -42,15 +40,13 @@ const BellTab = (): JSX.Element => {
 
   useEffect(() => {
     const initializeQueue = async (): Promise<void> => {
-      if (bells) {
-        console.log(bells)
-        // Start the bell scheduler
+      if (bells?.data) {
         await startScheduler(bells.data, bells._id, bells.tab_name)
       }
     }
 
     initializeQueue()
-  }, [bells])
+  }, [bells?._id, bells?.tab_name])
 
   async function handleTimeAdd(tabId: string, newTimeData: TimeData): Promise<void> {
     if (!tabId) return

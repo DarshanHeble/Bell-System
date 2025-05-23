@@ -4,13 +4,21 @@ import handBell from '@renderer/assets/Handbell.mp3'
 import { TimeData } from '@shared/type'
 import { toast } from 'sonner'
 
+let isPlaying = false
+
 /**
  * Plays an audio file from the given local file path.
  *
  * @param filePath - The absolute path to the audio file.
  */
 export const playAudio = async (timeData: TimeData): Promise<void> => {
+  if (isPlaying) {
+    console.log('Audio is already playing. Skipping playback.')
+    return
+  }
+
   const { music_file_name } = timeData
+  isPlaying = true
   console.log(`Attempting to play audio file: ${music_file_name}`)
 
   try {
@@ -39,6 +47,8 @@ export const playAudio = async (timeData: TimeData): Promise<void> => {
       notification.error(timeData)
       toast.error(`Failed to Play Any Bell: ${music_file_name}`)
     }
+  } finally {
+    isPlaying = false
   }
 }
 

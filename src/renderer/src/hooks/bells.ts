@@ -39,7 +39,14 @@ export const useAddBell = (
 
 export const useDeleteBell = (
   tabId?: string
-): UseMutationResult<boolean, Error, TimeData, unknown> => {
+): UseMutationResult<
+  boolean,
+  Error,
+  TimeData,
+  {
+    previousData: Tab | undefined
+  }
+> => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -47,9 +54,36 @@ export const useDeleteBell = (
       if (!tabId) throw new Error('Tab ID is required')
       return await deleteTime(tabId, timeData)
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bellTab', tabId] })
+    onMutate: async (deletedTimeData) => {
+      // Cancel outgoing fetches
+      await queryClient.cancelQueries({ queryKey: ['bellTab', tabId] })
+
+      // Get current data
+      const previousData = queryClient.getQueryData<Tab>(['bellTab', tabId])
+
+      // Optimistically update the data
+      queryClient.setQueryData<Tab | undefined>(['bellTab', tabId], (old) => {
+        if (!old) return old // No data to update
+        return {
+          ...old,
+          data: old.data.filter((item) => item.id !== deletedTimeData.id) // Remove the deleted TimeData
+        }
+      })
+
+      return { previousData }
+    },
+    onError: (_, __, context) => {
+      // Rollback to the previous state if the mutation fails
+      if (tabId && context?.previousData) {
+        queryClient.setQueryData(['bellTab', tabId], context.previousData)
+      }
     }
+    // onSettled: () => {
+    //   // Refetch the data from the server to ensure consistency
+    //   if (tabId) {
+    //     queryClient.invalidateQueries({ queryKey: ['bellTab', tabId] })
+    //   }
+    // }
   })
 }
 

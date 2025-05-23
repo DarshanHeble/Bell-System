@@ -37,7 +37,7 @@ export function registerZoomShortcuts(mainWindow: BrowserWindow): void {
   shortcuts.forEach((shortcutConfig) => {
     shortcutConfig.accelerators.forEach((accelerator) => {
       if (!globalShortcut.register(accelerator, shortcutConfig.action)) {
-        console.error(`Failed to register shortcut: ${accelerator}`)
+        // console.error(`Failed to register shortcut: ${accelerator}`)
       }
       //   else {
       //     console.log(`Shortcut registered: ${accelerator}`)

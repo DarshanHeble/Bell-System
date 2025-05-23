@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Box, Card, CardActionArea, CardContent, Typography, Switch } from '@mui/material'
 import { TimeData } from '@shared/type'
 import { daysOfWeek } from '@renderer/constants'
@@ -15,15 +15,23 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
   const [isChecked, setIsChecked] = useState<boolean>(data.switch_state)
   const [isScheduled, setIsScheduled] = useState(false)
 
-  useEffect(() => {
-    window.electron.ipcRenderer.on('schedule-updated', (_, response: TimeData | null) => {
+  const handleScheduleUpdate = useCallback(
+    (_, response: TimeData | null) => {
       if (response && data.id === response.id) {
         setIsScheduled(true)
       } else {
         setIsScheduled(false)
       }
-    })
-  }, [])
+    },
+    [data.id]
+  )
+
+  useEffect(() => {
+    const event = window.electron.ipcRenderer.on('schedule-updated', handleScheduleUpdate)
+    return (): void => {
+      event()
+    }
+  }, [handleScheduleUpdate])
 
   const handleContextMenu = (event: React.MouseEvent): void => {
     event.preventDefault()
@@ -35,8 +43,6 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
     setIsChecked(newValue) // Optimistically update the state
 
     try {
-      // console.log(`Switch state updated to: ${newValue}`)
-
       // Update the backend with the new value
       await window.electron.ipcRenderer.invoke('updateSwitch', tab_id, data.id, newValue)
 
@@ -122,4 +128,12 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
   )
 }
 
-export default AlarmCard
+export default memo(AlarmCard, (prevProps, nextProps) => {
+  // Only re-render if the data or onContextMenu reference changes
+  return (
+    prevProps.data.id === nextProps.data.id &&
+    prevProps.data.time === nextProps.data.time &&
+    prevProps.onContextMenu === nextProps.onContextMenu &&
+    prevProps.tab_id === nextProps.tab_id
+  )
+})

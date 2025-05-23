@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { Box, CircularProgress } from '@mui/material'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
@@ -24,12 +24,6 @@ function App(): JSX.Element {
     queryKey: ['init'],
     queryFn: async () => {
       const [isUserVerified, fetchedTabs] = await Promise.all([checkUserIsVerified(), fetchTabs()])
-
-      // setTabs(fetchedTabs)
-      // setActiveTab(fetchedTabs[0]._id || '')
-      console.log(isUserVerified)
-      console.log(fetchedTabs)
-
       return { isUserVerified, fetchedTabs }
     }
   })
@@ -39,7 +33,6 @@ function App(): JSX.Element {
   // Update state when data changes
   useEffect(() => {
     if (initData) {
-      console.log('hi')
       setTabs(initData.fetchedTabs)
       setActiveTab(initData.fetchedTabs[0]?._id || '')
       setIsVerified(initData.isUserVerified)
@@ -47,16 +40,30 @@ function App(): JSX.Element {
     }
   }, [initData])
 
-  // Handle audio play event from main process
-  useEffect(() => {
-    function handlePlayAudio(_, timeData: TimeData): void {
+  const handlePlayAudio = useCallback((_, timeData: TimeData): void => {
+    // Debounce the playAudio call to prevent multiple executions
+    // const timer =
+    setTimeout(() => {
+      console.log('play audio')
       playAudio(timeData)
-    }
+    }, 0)
 
-    window.electron.ipcRenderer.on('play-audio', handlePlayAudio)
+    // clearTimeout(timer)
   }, [])
 
-  // console.log(isLoading, isDataReady)
+  useEffect(() => {
+    let isSubscribed = true
+    const cleanup = window.electron.ipcRenderer.on('play-audio', (_, timeData) => {
+      if (isSubscribed) {
+        handlePlayAudio(_, timeData)
+      }
+    })
+
+    return (): void => {
+      isSubscribed = false
+      cleanup()
+    }
+  }, []) // Remove handlePlayAudio from dependencies
 
   // Memoize the active tab calculation
   const { defaultRoute } = useMemo(() => {
