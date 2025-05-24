@@ -14,7 +14,6 @@ import {
   addTimeDataToTab,
   checkUserVerified,
   deleteTimeData,
-  playAudio,
   updateSwitch,
   userVerified
 } from './utils'
@@ -47,12 +46,6 @@ const setupIpcHandlers = async (): Promise<void> => {
     updateSwitch(tab_id, timeDataID, switchState)
   )
 
-  // Audio management
-  ipcMain.handle(
-    'playAudio',
-    async (_, audioFileName: string, tab_name: string, timeData: TimeData) =>
-      await playAudio(audioFileName, tab_name, timeData)
-  )
   ipcMain.handle('select-music-file', async () => await selectAudioFile())
   ipcMain.handle('get-music-files', async () => await getMusicFiles())
   ipcMain.handle('deleteAudioFile', async (_, fileName: string) => await deleteAudioFile(fileName))
