@@ -12,6 +12,7 @@ import EmptyTabs from './pages/EmptyTabs'
 import { TabWithOutTimeData, TimeData } from '@shared/type'
 import { fetchTabs } from './Apis/tab'
 import { playAudio } from './utils/playAudio'
+import BellHistory from './pages/BellHistory'
 
 function App(): JSX.Element {
   const [isVerified, setIsVerified] = useState<boolean>(false)
@@ -124,6 +125,7 @@ function App(): JSX.Element {
               />
               <Route path="/tabs/:tabId" Component={BellTab} />
               <Route path="/manageAudioFiles" Component={ManageAudioFiles} />
+              <Route path="/history" Component={BellHistory} />
             </>
           ) : (
             <Route path="/" element={<Lock setVerified={setIsVerified} />} />

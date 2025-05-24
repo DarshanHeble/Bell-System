@@ -4,6 +4,15 @@ export type Time = {
   period: 'am' | 'pm'
 }
 
+export type AllDays =
+  | 'Sunday'
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+
 export type Day = {
   day: string
   active: boolean

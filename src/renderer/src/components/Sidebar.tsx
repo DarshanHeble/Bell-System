@@ -10,7 +10,7 @@ import {
   ListItemText,
   ListSubheader
 } from '@mui/material'
-import { Add, AudioFileOutlined } from '@mui/icons-material'
+import { Add, AudioFileOutlined, HistoryOutlined } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { Tab, TabWithOut_Id, TabWithOutTimeData } from '@shared/type'
 import NameDialog from './dialogs/NameDialog'
@@ -135,6 +135,14 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
                 <AudioFileOutlined />
               </ListItemIcon>
               <ListItemText primary="Manage files" sx={{ textAlign: 'left' }} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding sx={{ minWidth: 'max-content' }}>
+            <ListItemButton sx={{ borderRadius: '5rem' }} onClick={() => navigate('/history')}>
+              <ListItemIcon>
+                <HistoryOutlined />
+              </ListItemIcon>
+              <ListItemText primary="History" sx={{ textAlign: 'left' }} />
             </ListItemButton>
           </ListItem>
         </List>
