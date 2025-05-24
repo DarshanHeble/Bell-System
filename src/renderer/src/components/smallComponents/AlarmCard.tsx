@@ -72,7 +72,6 @@ const AlarmCard: React.FC<AlarmCardProps> = ({ data, tab_id, onContextMenu }) =>
         onContextMenu={handleContextMenu}
         onClick={handleContextMenu}
         sx={{
-          // Target the ripple effect
           '& .MuiTouchRipple-ripple .MuiTouchRipple-child': {
             backgroundColor: '#656565'
             // backgroundColor: alpha(theme.palette.primary.main, 0.6)

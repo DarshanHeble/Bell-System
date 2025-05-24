@@ -46,7 +46,7 @@ const BellTab = (): JSX.Element => {
     }
 
     initializeQueue()
-  }, [bells?._id, bells?.tab_name])
+  }, [bells?._id, bells?.tab_name, bells?.data])
 
   async function handleTimeAdd(tabId: string, newTimeData: TimeData): Promise<void> {
     if (!tabId) return
