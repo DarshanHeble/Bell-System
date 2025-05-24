@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  InputAdornment,
   TextField
 } from '@mui/material'
 import { FC, useEffect, useRef, useState } from 'react'
@@ -20,14 +21,24 @@ interface NameDialogProps {
 
 const NameDialog: FC<NameDialogProps> = ({ open, title, text, label, onClose, onSubmit }) => {
   const [name, setName] = useState<string>('')
+  const [extension, setExtension] = useState<string>('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (open) {
       const timer = setTimeout(() => {
         if (inputRef.current) {
+          if (text && text.includes('.')) {
+            const textArr = text.split('.')
+            const fileExtension = textArr.pop() || ''
+            const fileName = textArr.join('.')
+            setName(fileName)
+            setExtension(fileExtension)
+          } else {
+            setName(text || '')
+            setExtension('')
+          }
           inputRef.current.focus()
-          setName(text || '')
         }
       }, 200)
       return (): void => clearTimeout(timer)
@@ -39,7 +50,8 @@ const NameDialog: FC<NameDialogProps> = ({ open, title, text, label, onClose, on
     e.preventDefault() // Prevents the page from reloading
 
     if (name.trim()) {
-      onSubmit(name.trim())
+      const finalName = extension ? `${name.trim()}.${extension}` : name.trim()
+      onSubmit(finalName)
     }
 
     handleClose()
@@ -70,6 +82,13 @@ const NameDialog: FC<NameDialogProps> = ({ open, title, text, label, onClose, on
             fullWidth
             autoFocus
             required
+            slotProps={{
+              input: {
+                endAdornment: extension ? (
+                  <InputAdornment position="end">.{extension}</InputAdornment>
+                ) : null
+              }
+            }}
           />
         </DialogContent>
         <DialogActions>

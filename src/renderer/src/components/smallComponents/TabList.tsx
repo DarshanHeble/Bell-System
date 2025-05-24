@@ -61,6 +61,8 @@ const TabList: FC<TabListProps> = ({ data, activeTab, setActiveTab, onTabDelete,
     navigate(`/tabs/${data._id}`)
   }
 
+  // console.log(activeTab)
+
   return (
     <>
       <ListItem

@@ -40,6 +40,13 @@ const darkTheme = createTheme({
         }
       }
     },
+    MuiFab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none'
+        }
+      }
+    },
     MuiSwitch: {
       styleOverrides: {
         root: {

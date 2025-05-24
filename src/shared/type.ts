@@ -46,4 +46,5 @@ export type OtherDataType = {
 export type AudioFile = {
   name: string
   path: string
+  mimeType: string
 }

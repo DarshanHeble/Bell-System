@@ -1,8 +1,8 @@
 import { FC, useState } from 'react'
 import {
   Box,
-  Button,
   Divider,
+  Fab,
   List,
   ListItem,
   ListItemButton,
@@ -11,11 +11,12 @@ import {
   ListSubheader
 } from '@mui/material'
 import { Add, AudioFileOutlined } from '@mui/icons-material'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Tab, TabWithOut_Id, TabWithOutTimeData } from '@shared/type'
 import NameDialog from './dialogs/NameDialog'
 import TabList from './smallComponents/TabList'
 import { stopScheduler } from '@renderer/Apis/scheduler'
+import { updateActiveTab } from '@renderer/Apis/tab'
 
 interface SidebarProps {
   tabs: TabWithOutTimeData[]
@@ -26,6 +27,8 @@ interface SidebarProps {
 
 const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) => {
   const navigate = useNavigate()
+  const location = useLocation()
+
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
   const handleAddTab = async (tabName: string): Promise<void> => {
@@ -47,7 +50,7 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
 
     // not needed
     // SetData((prevData) => [...prevData, newTabData])
-
+    updateActiveTab(finalNewTabData._id, activeTab)
     setActiveTab(finalNewTabData._id)
     navigate(`/tabs/${_id}`)
   }
@@ -97,14 +100,24 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
           borderRight: '1px solid #202020'
         }}
       >
-        <Button
+        {/* <Button
           variant="contained"
           startIcon={<Add />}
+          color="secondary"
           onClick={() => setNameDialogOpen(true)}
-          sx={{ borderRadius: 5, textTransform: 'none', width: 'fit-content' }}
+          sx={{ borderRadius: 3, textTransform: 'none', width: 'fit-content', height: '3rem' }}
         >
           New Tab
-        </Button>
+        </Button> */}
+        <Fab
+          variant="extended"
+          color="default"
+          sx={{ width: 'fit-content', height: '3.5rem', borderRadius: 4 }}
+          onClick={() => setNameDialogOpen(true)}
+        >
+          <Add />
+          <span style={{ marginLeft: '0.5rem' }}>New Tab</span>
+        </Fab>
         {tabs.length === 0 ? (
           ' No Tabs Found'
         ) : (
@@ -126,12 +139,25 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
         )}
         <List sx={{ mt: 'auto' }}>
           <Divider sx={{ marginBlockEnd: '1rem' }} />
-          <ListItem disablePadding sx={{ minWidth: 'max-content' }}>
+          <ListItem
+            disablePadding
+            sx={{
+              minWidth: 'max-content',
+              borderRadius: '5rem',
+              backgroundColor: location.pathname.includes('manageAudioFiles') ? 'primary.main' : ''
+            }}
+          >
             <ListItemButton
-              sx={{ borderRadius: '5rem' }}
+              sx={{
+                borderRadius: '5rem',
+                color: location.pathname.includes('manageAudioFiles') ? 'black' : ''
+              }}
+              // selected={location.pathname.includes('manageAudioFiles')}
               onClick={() => navigate('/manageAudioFiles')}
             >
-              <ListItemIcon>
+              <ListItemIcon
+                sx={{ color: location.pathname.includes('manageAudioFiles') ? 'black' : '' }}
+              >
                 <AudioFileOutlined />
               </ListItemIcon>
               <ListItemText primary="Manage files" sx={{ textAlign: 'left' }} />

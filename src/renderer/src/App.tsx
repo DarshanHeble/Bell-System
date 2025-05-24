@@ -63,22 +63,25 @@ function App(): JSX.Element {
       isSubscribed = false
       cleanup()
     }
-  }, []) // Remove handlePlayAudio from dependencies
+  }, [])
 
   // Memoize the active tab calculation
   const { defaultRoute } = useMemo(() => {
     const tabs = initData?.fetchedTabs || []
-    const activeTab = tabs.find((tab) => tab.isActive === true)
-    if (activeTab) setActiveTab(activeTab._id)
+    const activeTabData = tabs.find((tab) => tab.isActive === true)
+    if (activeTabData) setActiveTab(activeTabData._id)
+
     const firstTab = tabs[0]
     return {
-      defaultRoute: activeTab
-        ? `/tabs/${activeTab._id}`
+      defaultRoute: activeTabData
+        ? `/tabs/${activeTabData._id}`
         : firstTab
           ? `/tabs/${firstTab._id}`
           : '/tabs/none'
     }
   }, [initData])
+
+  console.log(activeTab, 'active tab in app')
 
   if (isLoading || !isDataReady) {
     return (

@@ -20,6 +20,7 @@ import {
 } from '@mui/material'
 import {
   DeleteOutlined,
+  EditOutlined,
   InfoOutlined,
   MusicNoteOutlined,
   UploadFileOutlined
@@ -64,9 +65,9 @@ function ManageAudioFiles(): JSX.Element {
             <ArrowBackOutlined />
           </IconButton>
         </Tooltip> */}
-        <Typography variant="h6" sx={{ ml: 2 }}>
+        {/* <Typography variant="h6" sx={{ ml: 2 }}>
           Manage Audio Files
-        </Typography>
+        </Typography> */}
         <Box sx={{ ml: 'auto' }}>
           <Tooltip title="Info">
             <IconButton onClick={() => setHelpOpen(true)}>
@@ -75,7 +76,7 @@ function ManageAudioFiles(): JSX.Element {
           </Tooltip>
         </Box>
       </Toolbar>
-      <Divider />
+      {/* <Divider /> */}
       <Container sx={{ padding: 2 }}>
         <List>
           {musicFiles?.map((file, index) => (
@@ -87,22 +88,22 @@ function ManageAudioFiles(): JSX.Element {
                 <ListItemText sx={{ fontSize: '1.5rem' }}>
                   <Typography variant="h5"> {file.name}</Typography>
                 </ListItemText>
-                <div className="audio-player">
+                <div className="audio-player" style={{ marginRight: '5px' }}>
                   <audio controls>
-                    <source src={file.path} type="audio/mp3" />
+                    <source src={file.path} type={file.mimeType} />
                     Audio is not supported
                   </audio>
                 </div>
-                {/* <ListItemIcon>
+                <ListItemIcon>
                   <IconButton
                     onClick={() => {
-                      setSelectedFile(file_name)
+                      setSelectedFile(file)
                       setNameDialogOpen(true)
                     }}
                   >
                     <EditOutlined />
                   </IconButton>
-                </ListItemIcon> */}
+                </ListItemIcon>
                 <ListItemIcon>
                   <IconButton
                     color="error"
@@ -165,7 +166,15 @@ function ManageAudioFiles(): JSX.Element {
         text={selectedFile?.name || ''}
         onClose={() => setNameDialogOpen(false)}
         onSubmit={async (newFileName) => {
-          if (selectedFile) await renameAudioFile(selectedFile.name, newFileName)
+          if (selectedFile) {
+            const response = await renameAudioFile(selectedFile.name, newFileName)
+            if (response) {
+              toast.success('File renamed successfully')
+              refetchMusicFiles()
+            } else {
+              toast.error('Failed to rename file')
+            }
+          }
           setNameDialogOpen(false)
         }}
       />

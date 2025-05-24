@@ -4,6 +4,7 @@ import {
   projectMusicDirPath
 } from '@shared/constant'
 import { AudioFile } from '@shared/type'
+import { getMimeType } from '@shared/utils'
 import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -28,7 +29,8 @@ async function getMusicFiles(): Promise<AudioFile[]> {
         return {
           name: dirent.name,
           // Construct the custom protocol URL directly here
-          path: `${CUSTOM_PROTOCOL_SCHEME}://${rawFilePath.replace(/\\/g, '/')}`
+          path: `${CUSTOM_PROTOCOL_SCHEME}://${rawFilePath.replace(/\\/g, '/')}`,
+          mimeType: getMimeType(dirent.name)
         }
       }) satisfies AudioFile[]
 
