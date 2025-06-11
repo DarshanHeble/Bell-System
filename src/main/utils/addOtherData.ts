@@ -4,16 +4,13 @@ const addOtherData = async (): Promise<void> => {
   try {
     await pdbOther.get('other')
     console.log('other data already exists')
-
-    // console.log(response.ok)
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    if (error.status === 404) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
       try {
         await pdbOther.put({
           _id: 'other',
-          isVerified: false
+          isVerified: false,
+          theme: 'system'
         })
         console.log('successfully added other data')
       } catch (error) {

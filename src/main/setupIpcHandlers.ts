@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { Tab, TimeData } from '@shared/type'
+import { Tab, TimeData, OtherDataType } from '@shared/type'
 import { deleteAudioFile, getMusicFiles, renameAudioFile, selectAudioFile } from './utils/audios'
 import {
   addTab,
@@ -14,8 +14,10 @@ import {
   addTimeDataToTab,
   checkUserVerified,
   deleteTimeData,
+  getOtherData,
   updateSwitch,
-  userVerified
+  userVerified,
+  updateOtherData
 } from './utils'
 import {
   addScheduledItem,
@@ -26,6 +28,7 @@ import {
   updateScheduledItem
 } from './scheduler/bellScheduler'
 import { notification } from './utils/notification'
+import { getTheme, updateTheme } from './utils/theme'
 
 const setupIpcHandlers = async (): Promise<void> => {
   // Tab management
@@ -55,9 +58,14 @@ const setupIpcHandlers = async (): Promise<void> => {
       await renameAudioFile(oldFileName, newFileName)
   )
 
-  // User verification
+  // User verification and settings
   ipcMain.handle('userIsVerified', () => userVerified())
   ipcMain.handle('checkUserIsVerified', () => checkUserVerified())
+  ipcMain.handle('getOtherData', () => getOtherData())
+  ipcMain.handle('updateOtherData', (_, data: OtherDataType) => updateOtherData(data))
+
+  ipcMain.handle('getTheme', () => getTheme())
+  ipcMain.handle('updateTheme', (_, newTheme: OtherDataType['theme']) => updateTheme(newTheme))
 
   // Bell Scheduler
   ipcMain.handle(

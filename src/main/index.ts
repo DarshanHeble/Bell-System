@@ -2,7 +2,6 @@ import {
   app,
   shell,
   BrowserWindow,
-  nativeTheme,
   powerSaveBlocker,
   powerMonitor,
   protocol,
@@ -26,8 +25,8 @@ import { registerZoomShortcuts, unregisterZoomShortcuts } from './events'
 // set app name
 app.setName('Bell System')
 
-// set app to dark mode
-nativeTheme.themeSource = 'dark'
+// // set app to dark mode
+// nativeTheme.themeSource = 'system'
 
 //create app music folder
 mkdirSync(projectMusicDirPath, { recursive: true })

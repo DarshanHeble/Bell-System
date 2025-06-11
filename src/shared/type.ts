@@ -41,6 +41,7 @@ export type OtherDataType = {
   _id: string
   _rev: string
   isVerified: boolean
+  theme: 'light' | 'dark' | 'system'
 }
 
 export type AudioFile = {
