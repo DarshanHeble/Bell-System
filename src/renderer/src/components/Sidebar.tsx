@@ -8,15 +8,17 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListSubheader
+  ListSubheader,
+  Switch
 } from '@mui/material'
-import { Add, AudioFileOutlined } from '@mui/icons-material'
+import { Add, AudioFileOutlined, DarkModeOutlined } from '@mui/icons-material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Tab, TabWithOut_Id, TabWithOutTimeData } from '@shared/type'
 import NameDialog from './dialogs/NameDialog'
 import TabList from './smallComponents/TabList'
 import { stopScheduler } from '@renderer/Apis/scheduler'
 import { updateActiveTab } from '@renderer/Apis/tab'
+import { useTheme } from '@renderer/theme/ThemeContext'
 
 interface SidebarProps {
   tabs: TabWithOutTimeData[]
@@ -28,6 +30,7 @@ interface SidebarProps {
 const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { toggleTheme, isDarkMode } = useTheme()
 
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
@@ -97,18 +100,10 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
           flex: 1,
           gap: 3,
           p: '1rem',
-          borderRight: '1px solid #202020'
+          borderRight: '1px solid',
+          borderColor: isDarkMode ? '#ffffff1f' : '#e0e0e0'
         }}
       >
-        {/* <Button
-          variant="contained"
-          startIcon={<Add />}
-          color="secondary"
-          onClick={() => setNameDialogOpen(true)}
-          sx={{ borderRadius: 3, textTransform: 'none', width: 'fit-content', height: '3rem' }}
-        >
-          New Tab
-        </Button> */}
         <Fab
           variant="extended"
           color="default"
@@ -161,6 +156,18 @@ const Sidebar: FC<SidebarProps> = ({ tabs, activeTab, setTabs, setActiveTab }) =
                 <AudioFileOutlined />
               </ListItemIcon>
               <ListItemText primary="Manage files" sx={{ textAlign: 'left' }} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem
+            disablePadding
+            sx={{ borderRadius: '5rem' }}
+            secondaryAction={<Switch onChange={toggleTheme} checked={isDarkMode}></Switch>}
+          >
+            <ListItemButton onClick={toggleTheme} sx={{ borderRadius: '5rem' }}>
+              <ListItemIcon>
+                <DarkModeOutlined />
+              </ListItemIcon>
+              <ListItemText>Dark theme</ListItemText>
             </ListItemButton>
           </ListItem>
         </List>

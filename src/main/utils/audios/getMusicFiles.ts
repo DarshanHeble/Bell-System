@@ -34,7 +34,7 @@ async function getMusicFiles(): Promise<AudioFile[]> {
         }
       }) satisfies AudioFile[]
 
-    // console.log(audioFiles)
+    console.log(audioFiles)
 
     return audioFiles
   } catch (error) {

@@ -65,9 +65,9 @@ function ManageAudioFiles(): JSX.Element {
             <ArrowBackOutlined />
           </IconButton>
         </Tooltip> */}
-        {/* <Typography variant="h6" sx={{ ml: 2 }}>
-          Manage Audio Files
-        </Typography> */}
+        <Typography variant="h6" sx={{ ml: 2 }}>
+          All Audio Files
+        </Typography>
         <Box sx={{ ml: 'auto' }}>
           <Tooltip title="Info">
             <IconButton onClick={() => setHelpOpen(true)}>
@@ -77,7 +77,7 @@ function ManageAudioFiles(): JSX.Element {
         </Box>
       </Toolbar>
       {/* <Divider /> */}
-      <Container sx={{ padding: 2 }}>
+      <Container sx={{ padding: 2, paddingBlockStart: 0 }}>
         <List>
           {musicFiles?.map((file, index) => (
             <Box key={index}>

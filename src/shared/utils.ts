@@ -35,7 +35,8 @@ export function getCurrentDayName(): string {
   return daysOfWeek[now.getDay()] // getDay() returns 0 for Sunday, 1 for Monday, etc.
 }
 
-export function getMimeType(extension: string): string {
+export function getMimeType(fileName: string): string {
+  const extension = fileName.slice(fileName.lastIndexOf('.'))
   switch (extension.toLowerCase()) {
     case '.mp3':
       return 'audio/mpeg'
